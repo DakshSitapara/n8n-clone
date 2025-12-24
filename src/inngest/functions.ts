@@ -1,5 +1,6 @@
 import { inngest } from "./client";
 import  prisma  from "@/lib/db";
+import * as Sentry from "@sentry/nextjs";
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
@@ -17,6 +18,10 @@ export const execute = inngest.createFunction(
   async ({ event, step }) => {
     await step.sleep("pretend", "5s");
 
+    Sentry.logger.info('User triggered testlog', { log_source: 'sentry_test' });
+    console.warn("Somthing is wrong");
+    console.error("This is an error i went to track");
+
     const { steps : googleSteps } = await step.ai.wrap(
       "gemini-generate-text",
        generateText,
@@ -24,6 +29,11 @@ export const execute = inngest.createFunction(
         model: google('gemini-2.5-flash'),
         system: 'You are a helpful assistant.',
         prompt: 'what is the meaning of death?',
+        experimental_telemetry: {
+              isEnabled: true,
+              recordInputs: true,
+              recordOutputs: true,
+          },
       }
     );
 
@@ -34,6 +44,11 @@ export const execute = inngest.createFunction(
         model: openai('gpt-4'),
         system: 'You are a helpful assistant.',
         prompt: 'what is the meaning of death?',
+        experimental_telemetry: {
+            isEnabled: true,
+            recordInputs: true,
+            recordOutputs: true,
+          },
       }
     );
 
@@ -44,6 +59,11 @@ export const execute = inngest.createFunction(
         model: anthropic('claude-sonnet-4-5'),
         system: 'You are a helpful assistant.',
         prompt: 'what is the meaning of death?',
+        experimental_telemetry: {
+            isEnabled: true,
+            recordInputs: true,
+            recordOutputs: true,
+          },
       }
     );
 
@@ -54,6 +74,11 @@ export const execute = inngest.createFunction(
         model: groq('openai/gpt-oss-120b'),
         system: 'You are a helpful assistant.',
         prompt: 'what is the meaning of death?',
+        experimental_telemetry: {
+            isEnabled: true,
+            recordInputs: true,
+            recordOutputs: true,
+          },
       }
     );
     return {
