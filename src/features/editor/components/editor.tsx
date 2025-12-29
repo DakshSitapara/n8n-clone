@@ -20,7 +20,7 @@ export const EditorError = () => {
 export const Editor = ( { workflowId } : { workflowId : string } ) => {
     const { data : workflow } = useSuspenseWorkflow(workflowId);
 
-    const [nodes, setNodes] = useState<Node []>(workflow.nodes);
+  const [nodes, setNodes] = useState<Node []>(workflow.nodes);
   const [edges, setEdges] = useState<Edge []>(workflow.edges);
  
   const onNodesChange = useCallback(
