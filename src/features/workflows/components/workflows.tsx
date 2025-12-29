@@ -1,7 +1,8 @@
 'use client';
 
+import { formatDistanceToNow } from "date-fns";
 import { EmptyList, EmptyState, EntityContainer, EntityHeader, EntityItem, EntityPagination, EntitySearch, ErrorView, LoadingView } from "@/components/entity-componets";
-import { useCreateWorkflow, useSuspenseWorkflows } from "../hooks/use-workflows";
+import { useCreateWorkflow, useRemoveWorkflow, useSuspenseWorkflows } from "../hooks/use-workflows";
 import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
 import { useRouter } from "next/navigation";
 import { useWorkflowsParams } from "../hooks/use-workflows-params";
@@ -29,7 +30,7 @@ export const WorkflowsList = () => {
         <EmptyList 
             items={workflows.data.items}
             getKey={(workflow) => workflow.id}
-            renderItem={(workflow) => <div>{workflow.name}</div>}
+            renderItem={(workflow) => <WorkflowItem data={workflow} />}
             emptyView={<WorkflowsEmpty />}
         />
     )
@@ -125,16 +126,23 @@ export const WorkflowsEmpty = () => {
     )
 }
 
-export const WorkflowItems = ({ data, } : {data : Workflow}) => {
+export const WorkflowItem = ({ data, } : {data : Workflow}) => {
+
+    const removeWorkflow = useRemoveWorkflow();
+
+    const handleRemove = () => {
+         removeWorkflow.mutate({ id : data.id });
+    }
+
     return (
         <EntityItem
             href={`/workflows/${data.id}`}
             title={data.name}
             subtitle={
                 <>
-                Updated TODO {""}
-                &bull; Created{""}
-                TODO
+                Updated {formatDistanceToNow(data.updatedAt, { addSuffix: true })}{" "}
+                &bull; Created{" "}
+                {formatDistanceToNow(data.createdAt, { addSuffix: true })}
                 </>
             }
             image={
@@ -144,8 +152,8 @@ export const WorkflowItems = ({ data, } : {data : Workflow}) => {
                 </div>
                 </>
             } 
-            onRemove={() => {}}
-            isRemoving={false}
+            onRemove={handleRemove}
+            isRemoving={removeWorkflow.isPending}
         />
     )
 }
