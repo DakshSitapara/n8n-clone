@@ -101,8 +101,8 @@ enum NodeType {
 
 model Node {
   id String @id @default(cuid())
-  WorkflowId String
-  workflow Workflow @relation(fields: [WorkflowId], references: [id], onDelete: Cascade)
+  workflowId String
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 
   name String
   type NodeType
@@ -120,8 +120,8 @@ model Node {
 
 model Connection {
   id String @id @default(cuid())
-  WorkflowId String
-  workflow Workflow @relation(fields: [WorkflowId], references: [id], onDelete: Cascade)
+  workflowId String
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 
   fromNodeId String
   fromNode Node @relation("FromNode", fields: [fromNodeId], references: [id], onDelete: Cascade)
