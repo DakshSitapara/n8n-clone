@@ -20,25 +20,23 @@ const fromSchema = z.object({
         // .refine(),  TODO JSON5
 });
 
-export type FromType = z.infer<typeof fromSchema>;
+export type HttpRequestFromValues = z.infer<typeof fromSchema>;
 
 interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: z.infer<typeof fromSchema>) => void;
-    defultEndPoint?: string;
-    defultMethod?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-    defultBody?: string;
+    defultValue?: Partial<HttpRequestFromValues>;
 }
 
-export const HttpRequestDialog = ({ open, onOpenChange, onSubmit, defultEndPoint = "", defultMethod = "GET", defultBody = "" }: Props) => {
+export const HttpRequestDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: Props) => {
 
     const form = useForm<z.infer<typeof fromSchema>>({
         resolver: zodResolver(fromSchema),
         defaultValues: {
-            endpoint: defultEndPoint,
-            method: defultMethod,
-            body: defultBody,
+            endpoint: defultValue.endpoint || "",
+            method: defultValue.method || "GET",
+            body: defultValue.body || "",
         },
     });
 
@@ -46,12 +44,12 @@ export const HttpRequestDialog = ({ open, onOpenChange, onSubmit, defultEndPoint
     useEffect(() => {
         if (open) {
             form.reset({
-                endpoint: defultEndPoint,
-                method: defultMethod,
-                body: defultBody,
+                endpoint: defultValue.endpoint || "",
+                method: defultValue.method || "GET",
+                body: defultValue.body || "",
             });
         }
-    }, [open, defultEndPoint, defultMethod, defultBody, form]);
+    }, [open, defultValue, form]);
 
     const watchMethod = form.watch("method");
     const showBodyField = ["POST", "PUT", "PATCH"].includes(watchMethod);

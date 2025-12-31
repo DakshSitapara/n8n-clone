@@ -4,13 +4,12 @@ import { useReactFlow, type Node, type NodeProps } from "@xyflow/react";
 import { GlobeIcon } from "lucide-react";
 import { memo, useState } from "react";
 import { BaseExecutionNode } from "../base-execution-node";
-import { FromType, HttpRequestDialog } from "./dialog";
+import { HttpRequestFromValues, HttpRequestDialog } from "./dialog";
 
 type HttpRequestNodeData = {
-    endPoint?: string,
+    endpoint?: string,
     method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
     body?: string,
-    [key : string] : unknown,
 };
 
 type HttpRequestNodeType = Node<HttpRequestNodeData>;
@@ -26,7 +25,7 @@ export const HttpRequestNode = memo((props : NodeProps<HttpRequestNodeType>) => 
         setDialogOpen(true);
     }
 
-    const handleSubmit = (values : FromType) => {
+    const handleSubmit = (values : HttpRequestFromValues) => {
         setNodes((nodes) => 
             nodes.map((node) => {
                 if(node.id === props.id) {
@@ -34,9 +33,7 @@ export const HttpRequestNode = memo((props : NodeProps<HttpRequestNodeType>) => 
                         ...node,
                         data: {
                             ...node.data,
-                            endPoint: values.endpoint,
-                            method: values.method,
-                            body: values.body
+                            ...values,
                         }                        
                     }
                 }
@@ -45,7 +42,7 @@ export const HttpRequestNode = memo((props : NodeProps<HttpRequestNodeType>) => 
         )
     }
     const nodeData = props.data;
-    const description = nodeData?.endPoint ? `${nodeData.method || "GET"} : ${nodeData.endPoint}` : "Not configured";
+    const description = nodeData?.endpoint ? `${nodeData.method || "GET"} : ${nodeData.endpoint}` : "Not configured";
 
 
     return(
@@ -54,9 +51,7 @@ export const HttpRequestNode = memo((props : NodeProps<HttpRequestNodeType>) => 
             open={dialogOpen} 
             onOpenChange={setDialogOpen}
             onSubmit={handleSubmit}
-            defultEndPoint={nodeData.endPoint} // TODO: check if it can be improved by just sending initialValue={nodeData}
-            defultMethod={nodeData.method}
-            defultBody={nodeData.body} 
+            defultValue={nodeData}
         />
             <BaseExecutionNode
                 {...props}

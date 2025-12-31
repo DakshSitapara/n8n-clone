@@ -2,12 +2,12 @@
 
 import { memo, useState } from "react";
 import { PlusIcon } from "lucide-react";
-import type { NodeTypes } from "@xyflow/react";
+import type { NodeProps } from "@xyflow/react";
 import { PlaceholderNode } from "./react-flow/placeholder-node";
 import { WorkflowNode } from "./workflow-node";
 import { NodeSelector } from "./node-selector";
 
-export const InitialNode = memo((props : NodeTypes) => {
+export const InitialNode = memo((props : NodeProps) => {
 
     const [selectorOpen, setSelectorOpen] = useState(false);
 
