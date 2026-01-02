@@ -17,3 +17,7 @@ ERROR [lib::error] Error: channel closed
 ERROR [lib::error] Error: channel closed
 ERROR [lib::error] Error: channel closed
 ERROR [lib::error] Error: channel closed
+ERROR [lib::term::term_driver] stdin(err): Os { code: 5, kind: Uncategorized, message: "I/O error" }
+ERROR [lib::error] Error: channel closed
+ERROR [lib::error] Error: channel closed
+ERROR [lib::error] Error: channel closed

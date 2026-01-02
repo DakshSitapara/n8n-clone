@@ -8,6 +8,9 @@ import { httpRequestChannel } from "./channels/http-request";
 import { manualTriggerChannel } from "./channels/manual-trigger";
 import { googleFormTriggerChannel } from "./channels/google-form-trigger";
 import { stripeTriggerChannel } from "./channels/stripe-trigger";
+import { geminiChannel } from "./channels/gemini";
+import { groqChannel } from "./channels/groq";
+import { openaiChannel } from "./channels/openai";
   
 export const executeWorkflow = inngest.createFunction(
   { 
@@ -15,12 +18,15 @@ export const executeWorkflow = inngest.createFunction(
     retries: 0, // TODO: REMOVE IN PRODUCTION 
   },
   { 
-    event: "workflow/execute.workflow",
+    event: "workflows/execute.workflow",
     channels: [
       httpRequestChannel(),
       manualTriggerChannel(),
       googleFormTriggerChannel(),
       stripeTriggerChannel(),
+      geminiChannel(),
+      groqChannel(),
+      openaiChannel()
     ] 
   },
   async ({ event, step, publish }) => {
