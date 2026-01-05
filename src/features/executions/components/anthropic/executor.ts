@@ -2,8 +2,8 @@ import Handlebars from "handlebars";
 import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
 import { generateText } from "ai";
-import { createGroq } from '@ai-sdk/groq';
-import { groqChannel } from "@/inngest/channels/groq";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { anthropicChannel } from "@/inngest/channels/anthropic";
 import prisma from "@/lib/db";
 
 Handlebars.registerHelper('json', (context) => {
@@ -13,7 +13,7 @@ Handlebars.registerHelper('json', (context) => {
     return safeString;
 } );
 
-type GroqData = {
+type AnthropicData = {
     variableName?: string
     credentialId?: string
     model?: string
@@ -21,9 +21,9 @@ type GroqData = {
     userPrompt?: string
 }
 
-export const groqExecutor: NodeExecutor<GroqData> = async ({ data, nodeId, context, step, publish }) => {
+export const anthropicExecutor: NodeExecutor<AnthropicData> = async ({ data, nodeId, context, step, publish }) => {
     await publish(
-        groqChannel().status({
+        anthropicChannel().status({
             nodeId,
             status: "loading",
         })
@@ -31,33 +31,34 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({ data, nodeId, conte
 
     if(!data.variableName) {
         await publish(
-            groqChannel().status({
+            anthropicChannel().status({
                 nodeId,
                 status: "error",
             })
         );
-        throw new NonRetriableError("Groq node: Variable name is missing.");
+        throw new NonRetriableError("Anthropic node: Variable name is missing.");
     }
-
+    
     if(!data.credentialId) {
         await publish(
-            groqChannel().status({
+            anthropicChannel().status({
                 nodeId,
                 status: "error",
             })
         );
-        throw new NonRetriableError("Groq node: Credentials is missing.");
+        throw new NonRetriableError("Anthropic node: Credentials is missing.");
     }
 
     if(!data.userPrompt) {
         await publish(
-            groqChannel().status({
+            anthropicChannel().status({
                 nodeId,
                 status: "error",
             })
         );
-        throw new NonRetriableError("Groq node: User prompt is missing.");
+        throw new NonRetriableError("Anthropic node: User prompt is missing.");
     }
+
 
     const systemPrompt = data.systemPrompt ? Handlebars.compile(data.systemPrompt)(context) : "You are a helpful assistant." ;
     const userPrompt = Handlebars.compile(data.userPrompt)(context);
@@ -71,19 +72,19 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({ data, nodeId, conte
     })
 
     if(!credentials) {
-        throw new NonRetriableError("Groq node: Credentials not found.");
+        throw new NonRetriableError("Anthropic node: Credentials not found.");
     }
 
-    const groq = createGroq({
+    const anthropic = createAnthropic({
         apiKey: credentials.value,
     });
 
     try {
         const { steps } = await step.ai.wrap(
-            "groq-generate-text",
+            "anthropic-generate-text",
             generateText,
             {
-                model: groq(data.model || "openai/gpt-oss-120b"),
+                model: anthropic(data.model || "claude-3-5-sonnet-latest"),
                 system: systemPrompt,
                 prompt: userPrompt,
                 experimental_telemetry: {
@@ -96,7 +97,7 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({ data, nodeId, conte
         const text = steps[0].content[0].type === "text" ? steps[0].content[0].text : "";
 
         await publish(
-            groqChannel().status({
+            anthropicChannel().status({
                 nodeId,
                 status: "success",
             })
@@ -105,12 +106,12 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({ data, nodeId, conte
         return {
             ...context,
             [data.variableName]: {
-                text
+                 text
             },
         }
     } catch (error) {
         await publish(
-            groqChannel().status({
+            anthropicChannel().status({
                 nodeId,
                 status: "error",
             })

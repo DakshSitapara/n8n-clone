@@ -21,3 +21,6 @@ ERROR [lib::term::term_driver] stdin(err): Os { code: 5, kind: Uncategorized, me
 ERROR [lib::error] Error: channel closed
 ERROR [lib::error] Error: channel closed
 ERROR [lib::error] Error: channel closed
+ERROR [lib::error] Error: channel closed
+ERROR [lib::error] Error: channel closed
+ERROR [lib::error] Error: channel closed

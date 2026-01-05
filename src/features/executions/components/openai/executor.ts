@@ -4,6 +4,7 @@ import { NonRetriableError } from "inngest";
 import { generateText } from "ai";
 import { createOpenAI } from '@ai-sdk/openai';
 import { openaiChannel } from "@/inngest/channels/openai";
+import prisma from "@/lib/db";
 
 Handlebars.registerHelper('json', (context) => {
     const jsonString = JSON.stringify(context, null, 2);
@@ -14,6 +15,7 @@ Handlebars.registerHelper('json', (context) => {
 
 type OpenAiData = {
     variableName?: string
+    credentialId?: string
     model?: string
     systemPrompt?: string
     userPrompt?: string
@@ -37,6 +39,16 @@ export const openaiExecutor: NodeExecutor<OpenAiData> = async ({ data, nodeId, c
         throw new NonRetriableError("OpenAI node: Variable name is missing.");
     }
 
+    if(!data.credentialId) {
+        await publish(
+            openaiChannel().status({
+                nodeId,
+                status: "error",
+            })
+        );
+        throw new NonRetriableError("OpenAI node: Credentials is missing.");
+    }
+
     if(!data.userPrompt) {
         await publish(
             openaiChannel().status({
@@ -47,17 +59,24 @@ export const openaiExecutor: NodeExecutor<OpenAiData> = async ({ data, nodeId, c
         throw new NonRetriableError("OpenAI node: User prompt is missing.");
     }
 
-    // TODO : Throw if credentials is missing
 
     const systemPrompt = data.systemPrompt ? Handlebars.compile(data.systemPrompt)(context) : "You are a helpful assistant." ;
     const userPrompt = Handlebars.compile(data.userPrompt)(context);
 
-    // TODO: Fetch credentials that user selected
+    const credentials = await step.run("get-credential", () => {
+        return prisma.credential.findUnique({
+            where: {
+                id: data.credentialId
+            }
+        })
+    })
 
-    const credentialValue = process.env.GOOGLE_GENERATIVE_AI_API_KEY!;
+    if(!credentials) {
+        throw new NonRetriableError("OpenAI node: Credentials not found.");
+    }
 
     const openai = createOpenAI({
-        apiKey: credentialValue,
+        apiKey: credentials.value,
     });
 
     try {
@@ -65,7 +84,7 @@ export const openaiExecutor: NodeExecutor<OpenAiData> = async ({ data, nodeId, c
             "openai-generate-text",
             generateText,
             {
-                model: openai(data.model || "gpt-4"),
+                model: openai(data.model || "gpt-5"),
                 system: systemPrompt,
                 prompt: userPrompt,
                 experimental_telemetry: {

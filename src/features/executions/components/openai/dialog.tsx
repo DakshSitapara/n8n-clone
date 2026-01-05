@@ -10,12 +10,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+import { CredentialType } from "@/generated/prisma/enums";
+import Image from "next/image";
 
 export const AVAILABLE_MODELS = [
   { label: "GPT-5.2", value: "gpt-5.2" },
   { label: "GPT-5.1", value: "gpt-5.1" },
-  { label: "GPT-4",   value: "gpt-4" },
-  { label: "GPT-3.5 Turbo", value: "gpt-3.5-turbo" },
+  { label: "GPT-5",   value: "gpt-5" },
+  { label: "GPT-5 Mini", value: "gpt-5-mini" },
 ] as const;
 
 const fromSchema = z.object({
@@ -23,6 +26,7 @@ const fromSchema = z.object({
         .string()
         .min(1, { message: "Variable name is required" })
         .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, { message: "Variable name must start with a letter or underscore and contain only letters, numbers, and underscores" }),
+    credentialId: z.string().min(1, { message: "Credential ID is required" }),
     model: z.string().min(1, { message: "Model is required" }),
     systemPrompt: z.string().optional(),
     userPrompt: z.string().min(1, { message: "User prompt is required" }),
@@ -39,10 +43,16 @@ interface Props {
 
 export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: Props) => {
 
+        const { 
+            data: credentials , 
+            isLoading: isLoadingCredentials 
+        } = useCredentialsByType(CredentialType.OPENAI);
+
     const form = useForm<z.infer<typeof fromSchema>>({
         resolver: zodResolver(fromSchema),
         defaultValues: {
             variableName: defultValue.variableName || "",
+            credentialId: defultValue.credentialId || "",
             model: defultValue.model || AVAILABLE_MODELS[0].value,
             systemPrompt: defultValue.systemPrompt || "",
             userPrompt: defultValue.userPrompt || "",
@@ -54,6 +64,7 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
         if (open) {
             form.reset({
                 variableName: defultValue.variableName || "",
+                credentialId: defultValue.credentialId || "",
                 model: defultValue.model || AVAILABLE_MODELS[0].value,
                 systemPrompt: defultValue.systemPrompt || "",
                 userPrompt: defultValue.userPrompt || "",
@@ -97,7 +108,38 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />                
+                        />
+                        <FormField
+                            control={form.control}
+                            name="credentialId"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Gemini Credential</FormLabel>
+                                    <Select 
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        disabled={isLoadingCredentials || !credentials?.length}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select a credential" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {credentials?.map((credential) => (
+                                                <SelectItem key={credential.id} value={credential.id}>
+                                                    <div className="flex items-center gap-2">
+                                                    <Image src='/logos/openai.svg' alt="Gemini" width={16} height={16} /> 
+                                                    {credential.name}
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />                 
                         <FormField
                             control={form.control}
                             name="model"

@@ -66,7 +66,7 @@ const exexutionNodes : NodeTypeOption[] = [
         type : NodeType.GROQ,
         label : "Groq",
         description : "Uses Groq's large language models",
-        icon : "/logos/groq.webp",
+        icon : "/logos/groq.svg",
     }
 ];
 

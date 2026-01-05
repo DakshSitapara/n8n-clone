@@ -10,6 +10,7 @@ import { GROQ_CHANNEL_NAME } from "@/inngest/channels/groq";
 
 type GroqNodeData = {
     variableName?: string;
+    credentialId?: string;
     model?: string; 
     systemPrompt?: string;
     userPrompt?: string;
@@ -64,7 +65,7 @@ export const GroqNode = memo((props : NodeProps<GroqNodeType>) => {
             <BaseExecutionNode
                 {...props}
                 id={props.id}
-                icon="/logos/groq.webp"
+                icon="/logos/groq.svg"
                 name="Groq AI"
                 status={nodeStatus}
                 description={description}

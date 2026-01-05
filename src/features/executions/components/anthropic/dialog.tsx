@@ -10,16 +10,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
 import { CredentialType } from "@/generated/prisma/enums";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+import Image from "next/image";
 
 export const AVAILABLE_MODELS = [
-  { label: "OPENAI", value: "openai/gpt-oss-120b" },
-  { label: "LLAMA-4-Maverick", value: "meta-llama/llama-4-maverick-17b-128e-instruct" },
-  { label: "GPT-4",   value: "openai/gpt-oss-20b" },
-  { label: "LLAMA-4-Scout", value: "meta-llama/llama-4-scout-17b-16e-instruct" },
+    { label: "Claude 3.5 Sonnet", value: "claude-3-5-sonnet-latest" },
+    { label: "Claude 3 Opus", value: "claude-3-opus-latest" },
+    { label: "Claude 3 Sonnet", value: "claude-3-sonnet-latest" },
+    { label: "Claude 3 Haiku", value: "claude-3-haiku-latest" },
 ] as const;
+
 
 const fromSchema = z.object({
     variableName: z
@@ -27,26 +28,26 @@ const fromSchema = z.object({
         .min(1, { message: "Variable name is required" })
         .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, { message: "Variable name must start with a letter or underscore and contain only letters, numbers, and underscores" }),
     model: z.string().min(1, { message: "Model is required" }),
-    credentialId: z.string().min(1, { message: "Credential ID is required" }),
     systemPrompt: z.string().optional(),
+    credentialId: z.string().min(1, { message: "Credential ID is required" }),
     userPrompt: z.string().min(1, { message: "User prompt is required" }),
 });
 
-export type GroqFromValues = z.infer<typeof fromSchema>;
+export type AnthropicFromValues = z.infer<typeof fromSchema>;
 
 interface Props {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: z.infer<typeof fromSchema>) => void;
-    defultValue?: Partial<GroqFromValues>;
+    defultValue?: Partial<AnthropicFromValues>;
 }
 
-export const GroqDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: Props) => {
+export const AnthropicDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: Props) => {
 
     const { 
         data: credentials , 
         isLoading: isLoadingCredentials 
-    } = useCredentialsByType(CredentialType.GROQ);
+    } = useCredentialsByType(CredentialType.ANTHROPIC);
 
     const form = useForm<z.infer<typeof fromSchema>>({
         resolver: zodResolver(fromSchema),
@@ -72,7 +73,7 @@ export const GroqDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: 
         }
     }, [open, defultValue, form]);
 
-    const watchVariableName = form.watch("variableName") || "myGroq";
+    const watchVariableName = form.watch("variableName") || "myAnthropic";
 
     const handleSubmit = (values: z.infer<typeof fromSchema>) => {
         onSubmit(values);
@@ -83,7 +84,7 @@ export const GroqDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: 
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Groq Configuration</DialogTitle>
+                    <DialogTitle>Anthropic Configuration</DialogTitle>
                     <DialogDescription>
                         Configure the AI model and prompts for this node.
                     </DialogDescription>
@@ -98,7 +99,7 @@ export const GroqDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: 
                                     <FormLabel>Variable Name</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="myGroq" 
+                                            placeholder="myAnthropic" 
                                             {...field} 
                                         />
                                     </FormControl>
@@ -114,7 +115,7 @@ export const GroqDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: 
                             name="credentialId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Gemini Credential</FormLabel>
+                                    <FormLabel>Anthropic Credential</FormLabel>
                                     <Select 
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}
@@ -129,7 +130,7 @@ export const GroqDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: 
                                             {credentials?.map((credential) => (
                                                 <SelectItem key={credential.id} value={credential.id}>
                                                     <div className="flex items-center gap-2">
-                                                    <Image src='/logos/groq.svg' alt="Gemini" width={16} height={16} /> 
+                                                    <Image src='/logos/anthropic.svg' alt="Anthropic" width={16} height={16} /> 
                                                     {credential.name}
                                                     </div>
                                                 </SelectItem>
@@ -164,7 +165,7 @@ export const GroqDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: 
                                         </SelectContent>
                                     </Select>
                                     <FormDescription>
-                                        The Groq model to use for completion
+                                        The Anthropic AI model to use for completion
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>

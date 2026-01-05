@@ -11,6 +11,7 @@ import { stripeTriggerChannel } from "./channels/stripe-trigger";
 import { geminiChannel } from "./channels/gemini";
 import { groqChannel } from "./channels/groq";
 import { openaiChannel } from "./channels/openai";
+import { anthropicChannel } from "./channels/anthropic";
   
 export const executeWorkflow = inngest.createFunction(
   { 
@@ -26,7 +27,8 @@ export const executeWorkflow = inngest.createFunction(
       stripeTriggerChannel(),
       geminiChannel(),
       groqChannel(),
-      openaiChannel()
+      openaiChannel(),
+      anthropicChannel(),
     ] 
   },
   async ({ event, step, publish }) => {
