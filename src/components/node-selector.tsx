@@ -67,6 +67,24 @@ const exexutionNodes : NodeTypeOption[] = [
         label : "Groq",
         description : "Uses Groq's large language models",
         icon : "/logos/groq.svg",
+    },
+    {
+        type : NodeType.DISCORD,
+        label : "Discord",
+        description : "Send a message to Discord",
+        icon : "/logos/discord.svg",
+    },
+    {
+        type : NodeType.SLACK,
+        label : "Slack",
+        description : "Send a message to Slack",
+        icon : "/logos/slack.svg",
+    },
+    {
+        type : NodeType.TELEGRAM,
+        label : "Telegram",
+        description : "Send a message to Telegram",
+        icon : "/logos/telegram.svg",
     }
 ];
 
