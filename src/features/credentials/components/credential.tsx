@@ -1,15 +1,15 @@
 "use client";
 
 import { CredentialType } from "@/generated/prisma/enums";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useCreateCredential, useUpdateCredentials, useSuspenseCredentials } from "../hooks/use-credentials";
+import { useCreateCredential, useUpdateCredentials } from "../hooks/use-credentials";
 import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -81,7 +81,7 @@ export const CredentialForm = ({ initialData } : CredentialFormProps) => {
             })
         }else {
             await createCredential.mutateAsync(values, {
-                onSuccess: (data) => {
+                onSuccess: () => {
                     router.push(`/credentials`);
                 },
                 onError: (error) => {
