@@ -21,8 +21,7 @@ const fromSchema = z.object({
     body: z
         .string()
         .optional()
-        // .refine(),  TODO JSON5
-});
+    });
 
 export type HttpRequestFromValues = z.infer<typeof fromSchema>;
 

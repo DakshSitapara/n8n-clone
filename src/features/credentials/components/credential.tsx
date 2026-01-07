@@ -82,7 +82,7 @@ export const CredentialForm = ({ initialData } : CredentialFormProps) => {
         }else {
             await createCredential.mutateAsync(values, {
                 onSuccess: (data) => {
-                    router.push(`/credentials/${data.id}`);
+                    router.push(`/credentials`);
                 },
                 onError: (error) => {
                     handleError(error);
