@@ -86,7 +86,7 @@ export const ExecutionView = ({ executionId } : { executionId: string }) => {
                 </div>
 
                     {execution.error && (
-                    <div className="mt-6 p-4 bg-red-50 rounded-md space-y-3">
+                    <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-md space-y-3">
                         <div>
                         <p className="text-sm font-medium text-red-900 mb-2">Error</p>
                         <p className="text-sm text-red-800 font-mono truncate">{execution.error}</p>
@@ -113,7 +113,7 @@ export const ExecutionView = ({ executionId } : { executionId: string }) => {
                                     </Button>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
-                                    <pre className="text-xs text-red-800 font-mono overflow-auto mt-2 p-2 bg-red-100 rounded">
+                                    <pre className="text-xs text-red-800 font-mono overflow-auto mt-2 p-2 bg-red-100 dark:bg-red-950/20 rounded">
                                         {execution.errorStack}
                                     </pre>
                                 </CollapsibleContent>

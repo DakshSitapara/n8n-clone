@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangleIcon, Loader2Icon, MoreVerticalIcon, PackageOpenIcon, PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
+import { AlertTriangleIcon, MoreVerticalIcon, PackageOpenIcon, PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
@@ -149,7 +149,9 @@ interface StateViewProps {
 export const LoadingView = ({ message } : StateViewProps) => {
     return (
         <div className="flex items-center justify-center h-full flex-1 flex-col gap-y-4">
-            <Loader2Icon className="size-6 animate-spin text-primary" />
+            <picture>
+            <img src="/logos/logo.svg" alt="loading" className="size-6 animate-spin object-contain" />
+            </picture>
             {!!message &&
                 <p className="text-sm text-muted-foreground">
                     {message}
