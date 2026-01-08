@@ -1,10 +1,24 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
-import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, type Node, type Edge, type NodeChange, type EdgeChange, type Connection, Background, Controls, MiniMap, Panel } from '@xyflow/react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { ReactFlow, 
+         applyNodeChanges, 
+         applyEdgeChanges, 
+         addEdge, 
+         type Node, 
+         type Edge, 
+         type NodeChange, 
+         type EdgeChange, 
+         type Connection,  
+         type ColorMode,
+         Background, 
+         Controls, 
+         MiniMap, 
+         Panel 
+        } from '@xyflow/react';
 import { ErrorView, LoadingView } from "@/components/entity-componets";
 import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
-
+import { useTheme } from 'next-themes';
 import '@xyflow/react/dist/style.css';
 import { nodeComponents } from '@/config/node-components';
 import { AddNodeButton } from './add-node-buttone';
@@ -26,6 +40,9 @@ export const Editor = ( { workflowId } : { workflowId : string } ) => {
   
     const setEditor = useSetAtom(editorAtom);
 
+    const { theme } = useTheme();
+  const [colorMode, setColorMode] = useState<ColorMode>('system');
+
   const [nodes, setNodes] = useState<Node []>(workflow.nodes);
   const [edges, setEdges] = useState<Edge []>(workflow.edges);
  
@@ -45,6 +62,15 @@ export const Editor = ( { workflowId } : { workflowId : string } ) => {
   const hasManualTrigger = useMemo(() => {
     return nodes.some((node) => node.type === NodeType.MANUAL_TRIGGER);
   }, [nodes]);
+
+  useEffect(() => {
+    if (theme === 'dark' || theme === 'system') {
+      setColorMode('dark');
+    }
+    if (theme === 'light') {
+      setColorMode('light');
+    }
+  }, [theme]);
   
     return (
         <div className="size-full">
@@ -60,6 +86,7 @@ export const Editor = ( { workflowId } : { workflowId : string } ) => {
                 snapToGrid
                 panOnScroll
                 panOnDrag={false}
+                colorMode={colorMode}
                 selectionOnDrag
                 fitView
                 // proOptions={

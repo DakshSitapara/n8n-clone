@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { CreditCardIcon,FolderOpenIcon, HistoryIcon, KeyIcon, LogOutIcon, StarIcon } from "lucide-react";
+import { CreditCardIcon,FolderOpenIcon, HistoryIcon, KeyIcon, LogOutIcon, Monitor, Moon, StarIcon, Sun } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Sidebar,
@@ -17,6 +17,13 @@ import {
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
 import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscriptions";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useTheme } from "next-themes";
 
 const menuItems = [
     {
@@ -45,6 +52,7 @@ export const AppSidebar = () => {
     const router = useRouter();
     const pathname = usePathname();
     const { hasActiveSubscription, isLoading } = useHasActiveSubscription();
+    const {setTheme, theme, resolvedTheme } = useTheme();
 
     return (
         <Sidebar collapsible="icon">
@@ -115,6 +123,42 @@ export const AppSidebar = () => {
                                 <CreditCardIcon className="h-4 w-4" />
                                 <span>Billing portal</span>
                         </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <SidebarMenuButton
+                                    className="gap-x-4 h-10 px-4"
+                                    tooltip={`Toggle ${theme || "system"}`}
+                                >
+                                    {theme === "system" ? (
+                                    <Monitor className="h-4 w-4" />
+                                    ) : resolvedTheme === "dark" ? (
+                                    <Moon className="h-4 w-4" />
+                                    ) : (
+                                    <Sun className="h-4 w-4" />
+                                    )}
+                                    
+                                    <span>
+                                        Theme {theme || "system"}
+                                    </span>
+                                </SidebarMenuButton>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setTheme("light")}>
+                                    <Monitor className="h-4 w-4" />
+                                    <span>Light</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                                    <Moon className="h-4 w-4" />
+                                    <span>Dark</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("system")}>
+                                    <Monitor className="h-4 w-4" />
+                                    <span>System</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                            </DropdownMenu>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton

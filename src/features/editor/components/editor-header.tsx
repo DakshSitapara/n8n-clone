@@ -34,6 +34,7 @@ export const EditorSaveButton = ({ workflowId } : { workflowId : string }) => {
     return (
         <div className="ml-auto">
             <Button
+                variant="outline"
                 size="sm"
                 onClick={handeleSave}
                 disabled={saveWorkflow.isPending}
@@ -99,7 +100,7 @@ export const EditorNameInput = ({ workflowId } : { workflowId : string }) => {
                 onChange={(e) => setName(e.target.value)}
                 onBlur={handleSave}
                 onKeyDown={handleKeyDown}
-                className="h-7 w-auto min-w-[100px] px-2"
+                className="h-7 w-auto min-w-25 px-2"
             />
         )
     }
