@@ -4,6 +4,7 @@ import { Provider } from "jotai";
 import { TRPCReactProvider } from "@/trpc/client";
 import { Toaster } from "@/components/ui/sonner";
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,6 +36,7 @@ export default function RootLayout({
           <NuqsAdapter>
             <Provider>
               {children}
+              <Analytics />
               <Toaster />
             </Provider>
           </NuqsAdapter>
