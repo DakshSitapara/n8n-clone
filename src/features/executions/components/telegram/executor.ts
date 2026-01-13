@@ -117,6 +117,7 @@ export const telegramExecutor: NodeExecutor<TelegramData> = async ({
   }
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function throwError(
   nodeId: string,
   publish: any,
@@ -125,3 +126,5 @@ function throwError(
   publish(telegramChannel().status({ nodeId, status: "error" }));
   throw new NonRetriableError(`Telegram node: ${message}`);
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
