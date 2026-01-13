@@ -2,130 +2,126 @@ import Handlebars from "handlebars";
 import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
 import { telegramChannel } from "@/inngest/channels/telegram";
-import { decode } from "html-entities";
+import { decrypt } from "@/lib/encryption";
 import ky from "ky";
+import prisma from "@/lib/db";
 
-Handlebars.registerHelper('json', (context) => {
-    const jsonString = JSON.stringify(context, null, 2);
-    const safeString = new Handlebars.SafeString(jsonString);
-    
-    return safeString;
-} );
+Handlebars.registerHelper("json", (context) => {
+  return new Handlebars.SafeString(JSON.stringify(context, null, 2));
+});
+
+const TELEGRAM_METHOD_FIELD_MAP = {
+  sendMessage: "text",
+  sendPhoto: "photo",
+  sendVideo: "video",
+  sendDocument: "document",
+  sendAudio: "audio",
+  sendVoice: "voice",
+} as const;
+
+type TelegramMethod = keyof typeof TELEGRAM_METHOD_FIELD_MAP;
 
 type TelegramData = {
-    variableName? : string;
-    webhookUrl? : string;
-    content? : string;
-    username? : string;
-}
+  variableName?: string;
+  credentialId?: string;
+  method?: TelegramMethod;
+  content?: string;
+};
 
-export const telegramExecutor: NodeExecutor<TelegramData> = async ({ data, nodeId, context, step, publish }) => {
-    
-    await publish(
-        telegramChannel().status({
-            nodeId,
-            status: "loading",
-        })
+export const telegramExecutor: NodeExecutor<TelegramData> = async ({
+  data,
+  nodeId,
+  context,
+  step,
+  publish,
+  userId,
+}) => {
+  await publish(telegramChannel().status({ nodeId, status: "loading" }));
+
+  if (!data.variableName) throwError(nodeId, publish, "Variable name is missing.");
+  if (!data.credentialId) throwError(nodeId, publish, "Credentials is missing.");
+  if (!data.method) throwError(nodeId, publish, "Method is missing.");
+  if (!data.content) throwError(nodeId, publish, "Content is missing.");
+
+  const content = Handlebars.compile(data.content)(context);
+
+  const credentials = await step.run("get-credential", async () => {
+    return prisma.credential.findUnique({
+      where: { id: data.credentialId, userId },
+    });
+  });
+
+  if (!credentials) {
+    throwError(nodeId, publish, "Credentials not found.");
+  }
+
+  const token = decrypt(credentials.value);
+  if (!token) {
+    throwError(nodeId, publish, "Failed to decrypt Telegram token.");
+  }
+
+  const chat_id = await step.run("telegram-get-chat-id", async () => {
+    const res = await ky.get(
+      `https://api.telegram.org/bot${token}/getUpdates`
     );
 
-    if(!data.variableName) {
-        await publish(
-            telegramChannel().status({
-                nodeId,
-                status: "error",
-            })
-        );
-        throw new NonRetriableError("Telegram node: Variable name is missing.");
-    }
-
-    if(!data.webhookUrl) {
-        await publish(
-            telegramChannel().status({
-                nodeId,
-                status: "error",
-            })
-        );
-        throw new NonRetriableError("Telegram node: Webhook URL is missing.");
-    }
-    
-    if(!data.content) {
-        await publish(
-            telegramChannel().status({
-                nodeId,
-                status: "error",
-            })
-        );
-        throw new NonRetriableError("Telegram node: Content is missing.");
-    }
-
-    if(!data.username) {
-        await publish(
-            telegramChannel().status({
-                nodeId,
-                status: "error",
-            })
-        );
-        throw new NonRetriableError("Telegram node: username is missing.");
-    }
-
-    const rawContent = Handlebars.compile(data.content)(context);
-    const content = decode(rawContent);
-    const username = data.username ? decode(Handlebars.compile(data.username)(context)) : undefined;
-
-    try {
-        const result = await step.run("telegram-webhook", async () => {
-            
-            if(!data.webhookUrl) {
-                await publish(
-                    telegramChannel().status({
-                        nodeId,
-                        status: "error",
-                    })
-                );
-                throw new NonRetriableError("Telegram node: Webhook URL is missing.");
-            }
-
-            await ky.post(`${data.webhookUrl}${data.content}`, {
-                json: {
-                    content : content.slice(0, 2000),
-                    username
-                },
-            });
-
-        if(!data.variableName) {
-            await publish(
-                telegramChannel().status({
-                    nodeId,
-                    status: "error",
-                })
-            );
-            throw new NonRetriableError("Telegram node: Variable name is missing.");
-        };
-
-            return {
-                ...context,
-                [data.variableName]: {
-                    messageContent: content.slice(0, 2000),
-                }
-            }
-        })
-
-        await publish(
-            telegramChannel().status({
-                nodeId,
-                status: "success",
-            })
-        );
-
-        return result;
-
-    } catch (error) {
-            await publish(
-                telegramChannel().status({
-                    nodeId,
-                    status: "error",
-                })
-            );
-            throw error;
-        }
+    const body = (await res.json()) as {
+      result: Array<{ message?: { chat: { id: number } } }>;
     };
+
+    const msg = body.result.find((u) => u.message?.chat?.id);
+    if (!msg) {
+      throw new NonRetriableError(
+        "Telegram node: No chat_id found. Send a message to the bot first."
+      );
+    }
+
+    return msg.message!.chat.id;
+  });
+
+  try {
+    const result = await step.run("telegram-send", async () => {
+      const field = TELEGRAM_METHOD_FIELD_MAP[data.method!];
+
+      const payload: Record<string, unknown> = {
+        chat_id,
+      };
+
+      if (field === "text") {
+        payload.text = content.slice(0, 4096);
+        payload.parse_mode = "HTML";
+      } else {
+        payload[field] = content;
+      }
+
+      await ky.post(
+        `https://api.telegram.org/bot${token}/${data.method}`,
+        { json: payload }
+      );
+
+      return {
+        ...context,
+        [data.variableName!]: {
+          method: data.method,
+          content,
+          chat_id,
+        },
+      };
+    });
+
+    await publish(telegramChannel().status({ nodeId, status: "success" }));
+    return result;
+  } catch (error) {
+    await publish(telegramChannel().status({ nodeId, status: "error" }));
+    throw error;
+  }
+};
+
+function throwError(
+  nodeId: string,
+  publish: any,
+  message: string
+): never {
+  publish(telegramChannel().status({ nodeId, status: "error" }));
+  throw new NonRetriableError(`Telegram node: ${message}`);
+}

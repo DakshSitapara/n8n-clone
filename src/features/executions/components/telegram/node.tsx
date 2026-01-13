@@ -9,9 +9,10 @@ import { fetchTelegramRealtimeToken } from "./actions";
 import { TELEGRAM_CHANNEL_NAME } from "@/inngest/channels/telegram";
 
 type TelegramNodeData = {
-    webhookUrl? : string;
+    variableName? : string;
+    credentialId?: string;
+    method? : string;
     content? : string;
-    username? : string;
 };
 
 type TelegramNodeType = Node<TelegramNodeData>;
@@ -49,7 +50,7 @@ export const TelegramNode = memo((props : NodeProps<TelegramNodeType>) => {
         )
     }
     const nodeData = props.data;
-    const description = nodeData?.content ? `Send: ${nodeData.content.slice(0, 50)}...` : "Not configured";
+    const description = nodeData?.content ? `${nodeData.method || "Send" }: ${nodeData.content.slice(0, 50)}...` : "Not configured";
 
 
     return(

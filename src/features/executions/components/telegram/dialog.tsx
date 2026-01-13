@@ -9,15 +9,28 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectItem,SelectContent } from "@/components/ui/select";
+import Image from "next/image";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+import { CredentialType } from "@/generated/prisma/enums";
+
+const methodOptions = [
+    { value: "sendMessage", label: "Send Message" },
+    { value: "sendPhoto", label: "Send Photo" },
+    { value: "sendVideo", label: "Send Video" },
+    { value: "sendDocument", label: "Send Document" },
+    { value: "sendAudio", label: "Send Audio" },
+    { value: "sendVoice", label: "Send Voice" },
+];
 
 const fromSchema = z.object({
     variableName: z
         .string()
         .min(1, { message: "Variable name is required" })
         .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, { message: "Variable name must start with a letter or underscore and contain only letters, numbers, and underscores" }),
-    username : z.string().optional(),
-    content : z.string().min(1, { message: "Message content is required" }).max(2000, { message: "Telegram message must be less than 2000 characters" }),
-    webhookUrl : z.string().min(1, { message: "Webhook URL is required" }), 
+    credentialId: z.string().min(1, { message: "Credential ID is required" }),
+    method: z.string().min(1, { message: "Model is required" }),
+    content : z.string().min(0, { message: "Message content is required" }).optional()
 });
 
 export type TelegramFromValues = z.infer<typeof fromSchema>;
@@ -31,13 +44,18 @@ interface Props {
 
 export const TelegramDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: Props) => {
 
+    const { 
+        data: credentials , 
+        isLoading: isLoadingCredentials 
+    } = useCredentialsByType(CredentialType.TELEGRAM);
+
     const form = useForm<z.infer<typeof fromSchema>>({
         resolver: zodResolver(fromSchema),
         defaultValues: {
             variableName: defultValue.variableName || "",
-            username: defultValue.username || "",
+            credentialId: defultValue.credentialId || "",
+            method: defultValue.method || "",
             content: defultValue.content || "",
-            webhookUrl: defultValue.webhookUrl || "",
         },
     });
 
@@ -46,9 +64,9 @@ export const TelegramDialog = ({ open, onOpenChange, onSubmit, defultValue = {},
         if (open) {
             form.reset({
                 variableName: defultValue.variableName || "",
-                username: defultValue.username || "",
+                credentialId: defultValue.credentialId || "",
+                method: defultValue.method || "",
                 content: defultValue.content || "",
-                webhookUrl: defultValue.webhookUrl || "",
             });
         }
     }, [open, defultValue, form]);
@@ -92,18 +110,60 @@ export const TelegramDialog = ({ open, onOpenChange, onSubmit, defultValue = {},
                         />
                         <FormField
                             control={form.control}
-                            name="webhookUrl"
+                            name="credentialId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Webhook URL</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="https://telegram.com/api/webhooks/..." 
-                                            {...field}
-                                        />
-                                    </FormControl>
+                                    <FormLabel>Telegram Credential</FormLabel>
+                                    <Select 
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        disabled={isLoadingCredentials || !credentials?.length}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select a credential" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {credentials?.map((credential) => (
+                                                <SelectItem key={credential.id} value={credential.id}>
+                                                    <div className="flex items-center gap-2">
+                                                    <Image src='/logos/telegram.svg' alt="Telegram" width={16} height={16} /> 
+                                                    {credential.name}
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="method"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Method</FormLabel>
+                                    <Select 
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select a method" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {methodOptions.map((method) => (
+                                                <SelectItem key={method.value} value={method.value}>
+                                                    {method.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     <FormDescription>
-                                        Get this from Telegram: Channel Settings ⟶ Integrations ⟶ Webhooks
+                                        The Groq model to use for completion
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -124,25 +184,6 @@ export const TelegramDialog = ({ open, onOpenChange, onSubmit, defultValue = {},
                                     </FormControl>
                                     <FormDescription>
                                         The message to send. Use {"{{variables}}"} for simple values or {"{{json variable}}"} to stringify objects
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="username"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Bot Username(Optional)</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Workflow Bot"
-                                            {...field} 
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        Override the webhook&#39;s default username
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>

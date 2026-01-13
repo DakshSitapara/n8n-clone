@@ -99,6 +99,7 @@ enum CredentialType {
   OPENAI
   GEMINI
   GROQ
+  TELEGRAM
 }
 
 model Workflow {
