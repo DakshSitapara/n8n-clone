@@ -33,7 +33,7 @@ const [isSettingWebhook, setIsSettingWebhook] = useState(false);
     } = useCredentialsByType(CredentialType.TELEGRAM);
 
     // Construct the webhook URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
     const webhookUrl = `${baseUrl}/api/webhooks/telegram?workflowId=${workflowId}`;
 
     // const telegramWebhookUrl = `https://api.telegram.org/bot${selectedCredential}/setWebhook?url=${webhookUrl}`;
