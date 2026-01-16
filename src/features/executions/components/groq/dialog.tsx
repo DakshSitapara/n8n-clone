@@ -114,7 +114,7 @@ export const GroqDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: 
                             name="credentialId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Gemini Credential</FormLabel>
+                                    <FormLabel>Groq Credential</FormLabel>
                                     <Select 
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}

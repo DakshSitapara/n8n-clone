@@ -131,6 +131,7 @@ enum NodeType {
   GROQ
   DISCORD
   SLACK
+  TELEGRAM_TRIGGER
   TELEGRAM
 }
 

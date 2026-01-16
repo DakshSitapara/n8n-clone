@@ -114,7 +114,7 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
                             name="credentialId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Gemini Credential</FormLabel>
+                                    <FormLabel>OpenAI Credential</FormLabel>
                                     <Select 
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}

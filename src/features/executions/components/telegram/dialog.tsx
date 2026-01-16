@@ -30,7 +30,8 @@ const fromSchema = z.object({
         .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, { message: "Variable name must start with a letter or underscore and contain only letters, numbers, and underscores" }),
     credentialId: z.string().min(1, { message: "Credential ID is required" }),
     method: z.string().min(1, { message: "Model is required" }),
-    content : z.string().min(0, { message: "Message content is required" }).optional()
+    content : z.string().min(0, { message: "Message content is required" }).optional(),
+    chatId: z.string().min(0, { message: "Chat ID is required" }).optional(),
 });
 
 export type TelegramFromValues = z.infer<typeof fromSchema>;
@@ -56,6 +57,7 @@ export const TelegramDialog = ({ open, onOpenChange, onSubmit, defultValue = {},
             credentialId: defultValue.credentialId || "",
             method: defultValue.method || "",
             content: defultValue.content || "",
+            chatId: defultValue.chatId || "{{telegram.chatId}}",
         },
     });
 
@@ -67,6 +69,7 @@ export const TelegramDialog = ({ open, onOpenChange, onSubmit, defultValue = {},
                 credentialId: defultValue.credentialId || "",
                 method: defultValue.method || "",
                 content: defultValue.content || "",
+                chatId: defultValue.chatId || "{{telegram.chatId}}",
             });
         }
     }, [open, defultValue, form]);
@@ -139,6 +142,25 @@ export const TelegramDialog = ({ open, onOpenChange, onSubmit, defultValue = {},
                                 </FormItem>
                             )}
                         />
+                        <div className="hidden">
+                        <FormField
+                            control={form.control}
+                            name="chatId"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Chat ID</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            readOnly
+                                            placeholder="{{telegram.chatId}}" 
+                                            {...field} 
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        </div>
                         <FormField
                             control={form.control}
                             name="method"
@@ -163,7 +185,7 @@ export const TelegramDialog = ({ open, onOpenChange, onSubmit, defultValue = {},
                                         </SelectContent>
                                     </Select>
                                     <FormDescription>
-                                        The Groq model to use for completion
+                                        The method to use to send the message
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>

@@ -35,6 +35,12 @@ const triggerNodes : NodeTypeOption[] = [
         description : "Runs the flow when a Stripe event is captured.",
         icon : "/logos/stripe.svg",
     },
+    {
+        type : NodeType.TELEGRAM_TRIGGER,
+        label : "Telegram Event",
+        description : "Runs the flow when a Telegram event is captured.",
+        icon : "/logos/telegram.svg",
+    }
 ];
 
 const exexutionNodes : NodeTypeOption[] = [

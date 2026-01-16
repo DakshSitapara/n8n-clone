@@ -13,6 +13,7 @@ type TelegramNodeData = {
     credentialId?: string;
     method? : string;
     content? : string;
+    chatId? : string;
 };
 
 type TelegramNodeType = Node<TelegramNodeData>;

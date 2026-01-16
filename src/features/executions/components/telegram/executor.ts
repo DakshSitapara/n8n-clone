@@ -26,6 +26,7 @@ type TelegramData = {
   credentialId?: string;
   method?: TelegramMethod;
   content?: string;
+  chatId?: string;
 };
 
 export const telegramExecutor: NodeExecutor<TelegramData> = async ({
@@ -44,6 +45,19 @@ export const telegramExecutor: NodeExecutor<TelegramData> = async ({
   if (!data.content) throwError(nodeId, publish, "Content is missing.");
 
   const content = Handlebars.compile(data.content)(context);
+const chatIdRaw = data.chatId
+  ? Handlebars.compile(data.chatId)(context)
+  : undefined;
+
+const chat_id = Number(chatIdRaw);
+
+if (!chat_id || Number.isNaN(chat_id)) {
+  throwError(
+    nodeId,
+    publish,
+    "Invalid chatId. Use {{telegram.chatId}} or ensure workflow starts with Telegram Trigger."
+  );
+}
 
   const credentials = await step.run("get-credential", async () => {
     return prisma.credential.findUnique({
@@ -60,25 +74,25 @@ export const telegramExecutor: NodeExecutor<TelegramData> = async ({
     throwError(nodeId, publish, "Failed to decrypt Telegram token.");
   }
 
-  const chat_id = await step.run("telegram-get-chat-id", async () => {
-    const res = await ky.get(
-      `https://api.telegram.org/bot${token}/getUpdates`
-    );
+  // const chat_id = await step.run("telegram-get-chat-id", async () => {
+  //   const res = await ky.get(
+  //     `https://api.telegram.org/bot${token}/getUpdates`
+  //   );
 
-    const body = (await res.json()) as {
-      result: Array<{ message?: { chat: { id: number } } }>;
-    };
+  //   const body = (await res.json()) as {
+  //     result: Array<{ message?: { chat: { id: number } } }>;
+  //   };
 
-    const msg = body.result.find((u) => u.message?.chat?.id);
-    if (!msg) {
-      throw new NonRetriableError(
-        "Telegram node: No chat_id found. Send a message to the bot first."
-      );
-    }
+  //   const msg = body.result.find((u) => u.message?.chat?.id);
+  //   if (!msg) {
+  //     throw new NonRetriableError(
+  //       "Telegram node: No chat_id found. Send a message to the bot first."
+  //     );
+  //   }
 
-    return msg.message!.chat.id;
-  });
-
+  //   return msg.message!.chat.id;
+  // });
+  
   try {
     const result = await step.run("telegram-send", async () => {
       const field = TELEGRAM_METHOD_FIELD_MAP[data.method!];
