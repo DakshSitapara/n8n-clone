@@ -181,7 +181,7 @@ interface EmptyStateProps extends StateViewProps {
 
 export const EmptyState = ({ message, onNew } : EmptyStateProps) => {
     return (
-        <Empty className="border border-dashed bg-white">
+        <Empty className="border border-dashed bg-background">
             <EmptyHeader>
                 <EmptyMedia variant="icon">
                     <PackageOpenIcon />
