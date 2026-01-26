@@ -64,12 +64,7 @@ export const Editor = ( { workflowId } : { workflowId : string } ) => {
   }, [nodes]);
 
   useEffect(() => {
-    if (theme === 'dark' || theme === 'system') {
-      setColorMode('dark');
-    }
-    if (theme === 'light') {
-      setColorMode('light');
-    }
+    setColorMode(theme === 'system' ? 'system' : theme === 'dark' ? 'dark' : 'light');
   }, [theme]);
   
     return (
