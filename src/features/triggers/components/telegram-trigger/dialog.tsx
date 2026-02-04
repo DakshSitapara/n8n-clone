@@ -3,11 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-// import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
 import { CredentialType } from "@/generated/prisma/enums";
-// import { CopyIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { Select, SelectTrigger, SelectValue, SelectItem,SelectContent } from "@/components/ui/select";
@@ -32,20 +30,9 @@ const [isSettingWebhook, setIsSettingWebhook] = useState(false);
         isLoading: isLoadingCredentials 
     } = useCredentialsByType(CredentialType.TELEGRAM);
 
-    // Construct the webhook URL
     const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
     const webhookUrl = `${baseUrl}/api/webhooks/telegram?workflowId=${workflowId}`;
 
-    // const telegramWebhookUrl = `https://api.telegram.org/bot${selectedCredential}/setWebhook?url=${webhookUrl}`;
-    
-    // const copyToClipboard = async () => {
-    //     try {
-    //         await navigator.clipboard.writeText(telegramWebhookUrl);
-    //         toast.success("Webhook URL copied to clipboard!");
-    //     } catch {
-    //         toast.error("Failed to copy URL.");
-    //     }
-    // }
 
     const handleSetWebhook = async () => {
             try {
@@ -90,7 +77,7 @@ const [isSettingWebhook, setIsSettingWebhook] = useState(false);
                         <div className="flex gap-2">
                             <Select
                                 defaultValue={selectedCredential || ""}
-                                disabled={isLoadingCredentials}
+                                disabled={isLoadingCredentials || isSettingWebhook || credentials?.length === 0}
                                 onValueChange={setSelectedCredential}
                             >
                             <SelectTrigger id="credential" className="w-full">
@@ -118,32 +105,10 @@ const [isSettingWebhook, setIsSettingWebhook] = useState(false);
                             disabled={!selectedCredential || isSettingWebhook}
                             onClick={handleSetWebhook}
                             >
-                            {isSettingWebhook ? "Setting..." : "Set Webhook"}
+                            {isSettingWebhook ? "Setting Webhook..." : "Set Webhook"}
                             </Button>
                         </div>
                     </div>
-
-                    {/* <div className="space-y-2">
-                        <Label htmlFor="webhook-url">
-                            Webhook URL
-                        </Label>
-                        <div className="flex gap-2">
-                            <Input
-                                id="webhook-url"
-                                value={telegramWebhookUrl}
-                                readOnly
-                                className="font-mono text-sm"
-                            />
-                            <Button
-                                type="button"
-                                size="icon"
-                                variant="outline"
-                                onClick={copyToClipboard}
-                            >
-                                <CopyIcon className="size-4" />
-                            </Button>
-                        </div>
-                    </div> */}
 
                     <div className="rounded-lg bg-muted p-4 space-y-2">
                     <h4 className="font-medium text-sm">
