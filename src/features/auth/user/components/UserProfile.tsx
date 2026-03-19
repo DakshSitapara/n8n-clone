@@ -62,7 +62,7 @@ function ProfileCard() {
       <div className="px-5 pt-4 pb-0">
         <div className="flex items-center gap-2 mb-3">
           {!isLoading && user && (
-            <div className="h-7 w-7 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold overflow-hidden shrink-0">
+            <div className="h-7 w-7 rounded-full flex items-center justify-center text-white text-xs font-bold overflow-hidden shrink-0">
               {user.image ? (
                 <picture>
                   <img

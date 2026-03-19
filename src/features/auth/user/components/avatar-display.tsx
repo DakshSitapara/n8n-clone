@@ -15,7 +15,7 @@ export function AvatarDisplay({
     <>
       <div
         onClick={onClick}
-        className="h-4 w-4 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center overflow-hidden shrink-0"
+        className="h-4 w-4 rounded-full flex items-center justify-center overflow-hidden shrink-0"
       >
         {image ? (
           <picture>

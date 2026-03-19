@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  CheckCircle2Icon,
-  AlertCircleIcon,
   WorkflowIcon,
   KeyRoundIcon,
   CalendarIcon,
@@ -13,8 +11,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useUserData } from "../hooks/use-userData";
 import { EditableRow, ReadOnlyRow } from "./profile-rows";
-import { getInitials } from "../lib/helpers";
 import { toast } from "sonner";
+import AvatarUpload from "./avatar-upload";
 
 function ProfileSkeleton() {
   return (
@@ -83,33 +81,15 @@ export function ProfileTab() {
     <div className="flex flex-col">
       <div className="px-4 sm:px-5 pt-5 pb-4 border-b border-border">
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className="relative shrink-0">
-            <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-bold overflow-hidden shadow-md ring-2 ring-violet-200 dark:ring-violet-800 text-base sm:text-lg">
-              {user.image ? (
-                <picture>
-                  <img
-                    src={user.image}
-                    alt={user.name}
-                    className="h-full w-full object-cover"
-                  />
-                </picture>
-              ) : (
-                getInitials(user.name)
-              )}
-            </div>
-            <div
-              className={cn(
-                "absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-background flex items-center justify-center shadow-sm",
-                user.emailVerified ? "bg-emerald-500" : "bg-amber-400",
-              )}
-            >
-              {user.emailVerified ? (
-                <CheckCircle2Icon className="h-2.5 w-2.5 text-white" />
-              ) : (
-                <AlertCircleIcon className="h-2.5 w-2.5 text-white" />
-              )}
-            </div>
-          </div>
+          <AvatarUpload
+            name={user.name}
+            image={user.image}
+            emailVerified={user.emailVerified}
+            onUpload={async (base64) => {
+              await updateUser({ image: base64 });
+              toast.success("Profile picture updated");
+            }}
+          />
 
           <div className="flex-1 min-w-0 text-left">
             <p className="font-semibold text-sm sm:text-base leading-tight truncate">
