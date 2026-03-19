@@ -42,7 +42,7 @@ function TabBar({
           className={cn(
             "px-1 py-3 mr-5 text-sm font-medium border-b-2 -mb-px transition-colors capitalize",
             active === tab
-              ? "border-violet-600 text-violet-600 dark:border-violet-400 dark:text-violet-400"
+              ? "border-primary text-foreground hover:text-foreground"
               : "border-transparent text-muted-foreground hover:text-foreground",
           )}
         >

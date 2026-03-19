@@ -60,14 +60,12 @@ export default function AvatarUpload({
   return (
     <div className="relative shrink-0">
       {uploading && (
-        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-violet-500 animate-spin z-10 pointer-events-none" />
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-50 animate-spin z-10 pointer-events-none" />
       )}
       <div
         className={cn(
           "h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center text-white font-bold overflow-hidden shadow-md text-base sm:text-lg transition-all",
-          uploading
-            ? "opacity-70"
-            : "ring-2 ring-violet-200 dark:ring-violet-800",
+          uploading ? "opacity-70" : "ring-2 ring-amber-100 dark:ring-amber-50",
         )}
       >
         {currentImage ? (
@@ -79,7 +77,7 @@ export default function AvatarUpload({
             />
           </picture>
         ) : (
-          <div className="h-full w-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+          <div className="h-full w-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center">
             {getInitials(name)}
           </div>
         )}

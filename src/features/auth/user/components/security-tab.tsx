@@ -74,16 +74,16 @@ export function SecurityTab() {
 
   return (
     <div className="flex flex-col px-4 sm:px-5 py-4 gap-3">
-      <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800">
-        <div className="h-9 w-9 rounded-full bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0">
-          <ShieldIcon className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+      <div className="flex items-center gap-3 p-3 rounded-xl bg-accent border">
+        <div className="h-9 w-9 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
+          <ShieldIcon className="h-4 w-4 text-amber-900" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-violet-900 dark:text-violet-100">
+          <p className="text-sm font-medium">
             {activeSessions.length} active session
             {activeSessions.length !== 1 ? "s" : ""}
           </p>
-          <p className="text-xs text-violet-600/70 dark:text-violet-400/70">
+          <p className="text-xs text-muted-foreground">
             Across all your devices
           </p>
         </div>
@@ -119,7 +119,7 @@ export function SecurityTab() {
               className={cn(
                 "flex items-start gap-3 p-3 rounded-xl border transition-all duration-150",
                 isCurrent
-                  ? "border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-950/20"
+                  ? "bg-accent"
                   : "border-border bg-card hover:bg-muted/30",
               )}
             >
@@ -127,7 +127,7 @@ export function SecurityTab() {
                 className={cn(
                   "h-9 w-9 rounded-full flex items-center justify-center shrink-0 mt-0.5",
                   isCurrent
-                    ? "bg-violet-100 dark:bg-violet-900 text-violet-600 dark:text-violet-400"
+                    ? "bg-amber-50 text-amber-900"
                     : "bg-muted text-muted-foreground",
                 )}
               >
@@ -140,8 +140,8 @@ export function SecurityTab() {
                     {browser} on {os}
                   </p>
                   {isCurrent && (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300 shrink-0">
-                      <span className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 shrink-0">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
                       Current
                     </span>
                   )}
@@ -154,7 +154,7 @@ export function SecurityTab() {
                   {session.ipAddress && (
                     <div className="flex items-center gap-1 min-w-0">
                       <WifiIcon className="h-3 w-3 text-muted-foreground shrink-0" />
-                      <p className="text-[11px] font-mono text-muted-foreground truncate max-w-[120px]">
+                      <p className="text-[11px] font-mono text-muted-foreground truncate max-w-30">
                         {session.ipAddress}
                       </p>
                     </div>
