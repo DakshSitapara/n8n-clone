@@ -5,7 +5,6 @@ import { CheckIcon, XIcon, PencilIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-
 interface EditableRowProps {
   icon: React.ElementType;
   label: string;
@@ -28,10 +27,6 @@ export function EditableRow({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setDraft(value);
-  }, [value]);
 
   const commit = async () => {
     if (draft === value) {
@@ -57,6 +52,10 @@ export function EditableRow({
     setError(null);
     setEditing(false);
   };
+
+  useEffect(() => {
+    if (!editing) setDraft(value);
+  }, [value, editing]);
 
   return (
     <div className="group flex items-start gap-3 py-3 border-b border-border last:border-0">
@@ -115,7 +114,6 @@ export function EditableRow({
     </div>
   );
 }
-
 
 interface ReadOnlyRowProps {
   icon: React.ElementType;

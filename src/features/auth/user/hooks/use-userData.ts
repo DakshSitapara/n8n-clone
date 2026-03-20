@@ -14,7 +14,7 @@ export const useUserData = () => {
     retryDelay: 500,
   });
 
-  const { data: sessions, isLoading: isLoadingSessions } = useQuery({
+  const { data, isLoading: isLoadingSessions } = useQuery({
     ...trpc.user.getSessions.queryOptions(),
     staleTime: 1000 * 60 * 2,
     retry: 1,
@@ -42,7 +42,8 @@ export const useUserData = () => {
     isLoading,
     updateUser,
     isUpdating,
-    sessions: sessions ?? [],
+    sessions: data?.sessions ?? [],
+    currentSessionToken: data?.currentSessionToken ?? null,
     isLoadingSessions,
     revokeSession,
     isRevoking,

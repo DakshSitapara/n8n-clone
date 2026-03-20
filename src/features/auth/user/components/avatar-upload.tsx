@@ -29,7 +29,7 @@ export default function AvatarUpload({
       return;
     }
     if (file.size > 4 * 1024 * 1024) {
-      setError("Image must be under 4MB");
+      setError("Image must be under 4 MB");
       return;
     }
 
@@ -40,6 +40,12 @@ export default function AvatarUpload({
       reader.readAsDataURL(file);
     });
 
+    // skip if identical to already-saved image
+    if (base64 === image) {
+      e.target.value = "";
+      return;
+    }
+
     setPreview(base64);
     setError(null);
     setUploading(true);
@@ -48,7 +54,7 @@ export default function AvatarUpload({
       await onUpload(base64);
     } catch {
       setPreview(null);
-      setError("Upload failed");
+      setError("Upload failed — please try again");
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -58,14 +64,19 @@ export default function AvatarUpload({
   const currentImage = preview ?? image;
 
   return (
-    <div className="relative shrink-0">
+    <div className="relative shrink-0 w-18 h-18">
       {uploading && (
-        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-50 animate-spin z-10 pointer-events-none" />
+        <div className="absolute -inset-0.75 rounded-full border-2 border-transparent border-t-muted-foreground animate-spin z-10 pointer-events-none" />
       )}
+
       <div
         className={cn(
-          "h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center text-white font-bold overflow-hidden shadow-md text-base sm:text-lg transition-all",
-          uploading ? "opacity-70" : "opacity-100",
+          "w-18 h-18 rounded-full overflow-hidden border-2 transition-all duration-200",
+          uploading
+            ? "opacity-55 border-border"
+            : emailVerified
+              ? "border-emerald-300 dark:border-emerald-700"
+              : "border-border",
         )}
       >
         {currentImage ? (
@@ -90,19 +101,21 @@ export default function AvatarUpload({
       <button
         type="button"
         disabled={uploading}
-        onClick={() => inputRef.current?.click()}
+        onClick={() => {
+          setError(null);
+          inputRef.current?.click();
+        }}
+        title="Change profile picture"
         className={cn(
-          "absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full",
-          "border-2 border-background shadow-sm",
+          "absolute bottom-0.5 right-0.5 w-5.5 h-5.5 rounded-full z-20",
+          "border-2 border-background",
           "flex items-center justify-center",
-          "hover:scale-110 active:scale-95 transition-transform",
-          "disabled:opacity-50 disabled:cursor-not-allowed",
-          "size-5",
+          "transition-transform hover:scale-110 active:scale-95",
+          "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
           emailVerified
             ? "bg-emerald-500 hover:bg-emerald-600"
             : "bg-amber-400 hover:bg-amber-500",
         )}
-        title="Change profile picture"
       >
         {uploading ? (
           <LoaderIcon className="h-2.5 w-2.5 text-white animate-spin" />
@@ -120,7 +133,7 @@ export default function AvatarUpload({
       />
 
       {error && (
-        <p className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 text-[10px] text-destructive whitespace-nowrap bg-background border border-destructive/30 rounded px-1.5 py-0.5 shadow-sm z-10">
+        <p className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-30 text-[11px] text-destructive whitespace-nowrap bg-background border border-destructive/30 rounded-md px-2 py-1 shadow-sm">
           {error}
         </p>
       )}

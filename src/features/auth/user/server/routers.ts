@@ -20,9 +20,12 @@ export const userRouter = createTRPCRouter({
     });
   }),
 
-  getSessions: protectedProcedure.query(({ ctx }) => {
-    return prisma.session.findMany({
-      where: { userId: ctx.auth.user.id },
+  getSessions: protectedProcedure.query(async ({ ctx }) => {
+    const sessions = await prisma.session.findMany({
+      where: {
+        userId: ctx.auth.user.id,
+        expiresAt: { gt: new Date() },
+      },
       orderBy: { updatedAt: "desc" },
       select: {
         id: true,
@@ -34,6 +37,10 @@ export const userRouter = createTRPCRouter({
         token: true,
       },
     });
+    return {
+      currentSessionToken: ctx.auth.session.token,
+      sessions,
+    };
   }),
 
   revokeSession: protectedProcedure

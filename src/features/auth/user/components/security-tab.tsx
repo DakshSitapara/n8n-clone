@@ -50,8 +50,13 @@ function SecuritySkeleton() {
 }
 
 export function SecurityTab() {
-  const { sessions, isLoadingSessions, revokeSession, isRevoking } =
-    useUserData();
+  const {
+    sessions,
+    isLoadingSessions,
+    revokeSession,
+    isRevoking,
+    currentSessionToken,
+  } = useUserData();
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
   const handleRevoke = async (sessionId: string) => {
@@ -69,7 +74,13 @@ export function SecurityTab() {
   if (isLoadingSessions) return <SecuritySkeleton />;
 
   const now = new Date();
-  const activeSessions = sessions.filter((s) => new Date(s.expiresAt) > now);
+  const activeSessions = sessions
+    .filter((s) => new Date(s.expiresAt) > now)
+    .sort((a, b) => {
+      if (a.token === currentSessionToken) return -1;
+      if (b.token === currentSessionToken) return 1;
+      return 0;
+    });
   const expiredCount = sessions.length - activeSessions.length;
 
   return (
@@ -106,11 +117,11 @@ export function SecurityTab() {
       )}
 
       <div className="space-y-2">
-        {activeSessions.map((session, i) => {
+        {activeSessions.map((session) => {
           const { device, browser, os, icon } = parseUserAgent(
             session.userAgent,
           );
-          const isCurrent = i === 0;
+          const isCurrent = session.token === currentSessionToken;
           const isBeingRevoked = revokingId === session.id;
 
           return (
