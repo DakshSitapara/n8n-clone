@@ -6,6 +6,9 @@ import {
   DialogClose,
   DialogContent,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Drawer,
@@ -14,6 +17,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -72,7 +76,13 @@ function ProfileCard() {
                   />
                 </picture>
               ) : (
-                getInitials(user.name)
+                <picture>
+                  <img
+                    src={`https://avatar.vercel.sh/${user.name}.svg?text=${getInitials(user.name)}&rounded=60`}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                  />
+                </picture>
               )}
             </div>
           )}
@@ -92,6 +102,7 @@ function ProfileCard() {
 const UserProfile = () => {
   const isMobile = useIsMobile();
   const { user, isLoading } = useUserData();
+
   const [open, setOpen] = useState(false);
 
   if (isLoading) {
@@ -107,51 +118,62 @@ const UserProfile = () => {
 
   if (isMobile) {
     return (
-      <>
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>
+          <AvatarDisplay
+            name={user.name}
+            image={user.image}
+            onClick={() => setOpen(true)}
+          />
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader className="pb-0 px-0">
+            <DrawerTitle className="sr-only">Account</DrawerTitle>
+            <ProfileCard />
+          </DrawerHeader>
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Close
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <AvatarDisplay
           name={user.name}
           image={user.image}
           onClick={() => setOpen(true)}
         />
-        <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerContent>
-            <DrawerHeader className="pb-0 px-0">
-              <DrawerTitle className="sr-only">Account</DrawerTitle>
-              <ProfileCard />
-            </DrawerHeader>
-            <DrawerFooter>
-              <DrawerClose asChild>
-                <Button variant="outline" size="sm">
-                  Close
-                </Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <AvatarDisplay
-        name={user.name}
-        image={user.image}
-        onClick={() => setOpen(true)}
-      />
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-100 p-0 gap-0 overflow-hidden">
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-100 p-0 gap-0 overflow-hidden">
+        <DialogHeader className="pb-0 px-0">
+          <DialogTitle className="sr-only">Account</DialogTitle>
           <ProfileCard />
-          <DialogFooter className="px-5 py-3 border-t border-border">
-            <DialogClose asChild>
-              <Button variant="outline" size="sm">
-                Close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+        </DialogHeader>
+        <DialogFooter className="px-5 py-3 border-t border-border">
+          <DialogClose asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -26,9 +26,13 @@ export function AvatarDisplay({
             />
           </picture>
         ) : (
-          <span className="text-[9px] font-bold text-white leading-none">
-            {getInitials(name)}
-          </span>
+          <picture>
+            <img
+              src={`https://avatar.vercel.sh/${name}.svg?text=${getInitials(name)}&rounded=60`}
+              alt={name}
+              className="h-full w-full object-cover"
+            />
+          </picture>
         )}
       </div>
       <span className="truncate w-full" onClick={onClick}>

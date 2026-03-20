@@ -65,7 +65,7 @@ export default function AvatarUpload({
       <div
         className={cn(
           "h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center text-white font-bold overflow-hidden shadow-md text-base sm:text-lg transition-all",
-          uploading ? "opacity-70" : "ring-2 ring-amber-100 dark:ring-amber-50",
+          uploading ? "opacity-70" : "opacity-100",
         )}
       >
         {currentImage ? (
@@ -77,9 +77,13 @@ export default function AvatarUpload({
             />
           </picture>
         ) : (
-          <div className="h-full w-full bg-linear-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-            {getInitials(name)}
-          </div>
+          <picture>
+            <img
+              src={`https://avatar.vercel.sh/${name}.svg?text=${getInitials(name)}&rounded=60`}
+              alt={name}
+              className="h-full w-full object-cover"
+            />
+          </picture>
         )}
       </div>
 

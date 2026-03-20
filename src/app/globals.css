@@ -186,3 +186,8 @@
 .react-flow__node.selected #base-node {
   @apply ring-3 ring-muted-foreground/25 shadow-lg;
 }
+
+::selection {
+  background: var(--foreground);
+  color: var(--background);
+}
