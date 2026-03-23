@@ -1,61 +1,64 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { ReactFlow, 
-         applyNodeChanges, 
-         applyEdgeChanges, 
-         addEdge, 
-         type Node, 
-         type Edge, 
-         type NodeChange, 
-         type EdgeChange, 
-         type Connection,  
-         type ColorMode,
-         Background, 
-         Controls, 
-         MiniMap, 
-         Panel 
-        } from '@xyflow/react';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import {
+  ReactFlow,
+  applyNodeChanges,
+  applyEdgeChanges,
+  addEdge,
+  type Node,
+  type Edge,
+  type NodeChange,
+  type EdgeChange,
+  type Connection,
+  Background,
+  Controls,
+  MiniMap,
+  Panel,
+} from "@xyflow/react";
 import { ErrorView, LoadingView } from "@/components/entity-componets";
 import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
-import { useTheme } from 'next-themes';
-import '@xyflow/react/dist/style.css';
-import { nodeComponents } from '@/config/node-components';
-import { AddNodeButton } from './add-node-buttone';
-import { useSetAtom } from 'jotai';
-import { editorAtom } from '../store/atoms';
-import { NodeType } from '@/generated/prisma/enums';
-import { ExecuteWorkflowButton } from './execute-workflow-button';
+import { useTheme } from "next-themes";
+import "@xyflow/react/dist/style.css";
+import { nodeComponents } from "@/config/node-components";
+import { AddNodeButton } from "./add-node-buttone";
+import { useSetAtom } from "jotai";
+import { editorAtom } from "../store/atoms";
+import { NodeType } from "@/generated/prisma/enums";
+import { ExecuteWorkflowButton } from "./execute-workflow-button";
 
 export const EditorLoading = () => {
-    return <LoadingView message="Loading editor..." />
-}
+  return <LoadingView message="Loading editor..." />;
+};
 
 export const EditorError = () => {
-    return <ErrorView message="Error loading editor" />
-}
+  return <ErrorView message="Error loading editor" />;
+};
 
-export const Editor = ( { workflowId } : { workflowId : string } ) => {
-    const { data : workflow } = useSuspenseWorkflow(workflowId);
-  
-    const setEditor = useSetAtom(editorAtom);
+export const Editor = ({ workflowId }: { workflowId: string }) => {
+  const { data: workflow } = useSuspenseWorkflow(workflowId);
 
-    const { theme } = useTheme();
-  const [colorMode, setColorMode] = useState<ColorMode>('system');
+  const setEditor = useSetAtom(editorAtom);
 
-  const [nodes, setNodes] = useState<Node []>(workflow.nodes);
-  const [edges, setEdges] = useState<Edge []>(workflow.edges);
- 
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
+  const [edges, setEdges] = useState<Edge[]>(workflow.edges);
+
   const onNodesChange = useCallback(
-    (changes : NodeChange []) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
+    (changes: NodeChange[]) =>
+      setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
     [],
   );
   const onEdgesChange = useCallback(
-    (changes : EdgeChange []) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
+    (changes: EdgeChange[]) =>
+      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
     [],
   );
   const onConnect = useCallback(
-    (params : Connection) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
+    (params: Connection) =>
+      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
     [],
   );
 
@@ -64,44 +67,46 @@ export const Editor = ( { workflowId } : { workflowId : string } ) => {
   }, [nodes]);
 
   useEffect(() => {
-    setColorMode(theme === 'system' ? 'system' : theme === 'dark' ? 'dark' : 'light');
-  }, [theme]);
-  
-    return (
-        <div className="size-full">
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                nodeTypes={nodeComponents}
-                onInit={setEditor}
-                snapGrid={[10,10]}
-                snapToGrid
-                panOnScroll
-                panOnDrag={false}
-                colorMode={colorMode}
-                selectionOnDrag
-                fitView
-                // proOptions={
-                //     {
-                //         hideAttribution: true
-                //     }
-                // }
-            >
-                <Background />
-                <Controls />
-                <MiniMap />
-                <Panel position='top-right'>
-                  <AddNodeButton />
-                </Panel>
-                {hasManualTrigger &&
-                    <Panel position='bottom-center'>
-                      <ExecuteWorkflowButton workflowId={workflowId} />
-                    </Panel>
-                }
-            </ReactFlow>
-        </div>
-    )
-}
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <LoadingView message="Loading node..." />;
+  }
+
+  return (
+    <div className="size-full">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeComponents}
+        onInit={setEditor}
+        snapGrid={[10, 10]}
+        snapToGrid
+        panOnScroll
+        panOnDrag={false}
+        colorMode={resolvedTheme === "dark" ? "dark" : "light"}
+        selectionOnDrag
+        fitView
+        proOptions={{
+          hideAttribution: true,
+        }}
+      >
+        <Background />
+        <Controls />
+        <MiniMap />
+        <Panel position="top-right">
+          <AddNodeButton />
+        </Panel>
+        {hasManualTrigger && (
+          <Panel position="bottom-center">
+            <ExecuteWorkflowButton workflowId={workflowId} />
+          </Panel>
+        )}
+      </ReactFlow>
+    </div>
+  );
+};

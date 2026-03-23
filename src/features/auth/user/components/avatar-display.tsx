@@ -5,18 +5,13 @@ import { getInitials } from "../lib/helpers";
 export function AvatarDisplay({
   name,
   image,
-  onClick,
 }: {
   name: string;
   image?: string | null;
-  onClick?: () => void;
 }) {
   return (
     <>
-      <div
-        onClick={onClick}
-        className="h-4 w-4 rounded-full flex items-center justify-center overflow-hidden shrink-0"
-      >
+      <div className="h-4 w-4 rounded-full flex items-center justify-center overflow-hidden shrink-0">
         {image ? (
           <picture>
             <img
@@ -35,9 +30,7 @@ export function AvatarDisplay({
           </picture>
         )}
       </div>
-      <span className="truncate w-full" onClick={onClick}>
-        {name}
-      </span>
+      <span className="truncate w-full">{name}</span>
     </>
   );
 }

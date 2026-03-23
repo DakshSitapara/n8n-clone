@@ -9,14 +9,16 @@ export const useUserData = () => {
 
   const { data: user, isLoading } = useQuery({
     ...trpc.user.getOne.queryOptions(),
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
+    gcTime: Infinity,
     retry: 1,
     retryDelay: 500,
   });
 
   const { data, isLoading: isLoadingSessions } = useQuery({
     ...trpc.user.getSessions.queryOptions(),
-    staleTime: 1000 * 60 * 2,
+    staleTime: Infinity,
+    gcTime: Infinity,
     retry: 1,
     retryDelay: 500,
   });

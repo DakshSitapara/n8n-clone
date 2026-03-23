@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -27,6 +27,7 @@ import { AvatarDisplay } from "./avatar-display";
 import { ProfileTab } from "./profile-tab";
 import { SecurityTab } from "./security-tab";
 import { getInitials } from "../lib/helpers";
+import { SidebarMenuButton } from "@/components/ui/sidebar";
 
 type Tab = "profile" | "security";
 
@@ -103,14 +104,18 @@ const UserProfile = () => {
   const isMobile = useIsMobile();
   const { user, isLoading } = useUserData();
 
-  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || isLoading) {
     return (
-      <>
+      <SidebarMenuButton className="gap-x-4 h-10 px-4">
         <div className="h-4 w-4 rounded-full bg-muted animate-pulse shrink-0" />
         <span className="h-3 w-20 rounded bg-muted animate-pulse" />
-      </>
+      </SidebarMenuButton>
     );
   }
 
@@ -118,13 +123,14 @@ const UserProfile = () => {
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={setOpen}>
+      <Drawer>
         <DrawerTrigger asChild>
-          <AvatarDisplay
-            name={user.name}
-            image={user.image}
-            onClick={() => setOpen(true)}
-          />
+          <SidebarMenuButton
+            className="gap-x-4 h-10 px-4"
+            tooltip={`${user.name} (${user.email})`}
+          >
+            <AvatarDisplay name={user.name} image={user.image} />
+          </SidebarMenuButton>
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader className="pb-0 px-0">
@@ -133,11 +139,7 @@ const UserProfile = () => {
           </DrawerHeader>
           <DrawerFooter>
             <DrawerClose asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => e.stopPropagation()}
-              >
+              <Button variant="outline" size="sm">
                 Close
               </Button>
             </DrawerClose>
@@ -148,13 +150,14 @@ const UserProfile = () => {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog>
       <DialogTrigger asChild>
-        <AvatarDisplay
-          name={user.name}
-          image={user.image}
-          onClick={() => setOpen(true)}
-        />
+        <SidebarMenuButton
+          className="gap-x-4 h-10 px-4"
+          tooltip={`${user.name}` || `${user.email}`}
+        >
+          <AvatarDisplay name={user.name} image={user.image} />
+        </SidebarMenuButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-100 p-0 gap-0 overflow-hidden">
         <DialogHeader className="pb-0 px-0">
@@ -163,11 +166,7 @@ const UserProfile = () => {
         </DialogHeader>
         <DialogFooter className="px-5 py-3 border-t border-border">
           <DialogClose asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <Button variant="outline" size="sm">
               Close
             </Button>
           </DialogClose>

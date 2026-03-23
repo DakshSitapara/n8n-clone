@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -64,6 +65,19 @@ export const AppSidebar = () => {
   const pathname = usePathname();
   const { hasActiveSubscription, isLoading } = useHasActiveSubscription();
   const { setTheme, theme, resolvedTheme } = useTheme();
+
+  const [mounted, setMounted] = useState(false);
+
+  const ThemeIcon =
+    !mounted || theme === "system"
+      ? Monitor
+      : resolvedTheme === "dark"
+        ? Moon
+        : Sun;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <Sidebar collapsible="icon">
@@ -142,17 +156,10 @@ export const AppSidebar = () => {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   className="gap-x-4 h-10 px-4"
-                  tooltip={`Toggle ${theme || "system"}`}
+                  tooltip={`Toggle ${mounted ? theme : "system"}`}
                 >
-                  {theme === "system" ? (
-                    <Monitor className="h-4 w-4" />
-                  ) : resolvedTheme === "dark" ? (
-                    <Moon className="h-4 w-4" />
-                  ) : (
-                    <Sun className="h-4 w-4" />
-                  )}
-
-                  <span>Theme {theme || "system"}</span>
+                  <ThemeIcon className="h-4 w-4" />
+                  <span>Theme {mounted ? theme : "system"}</span>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -190,12 +197,7 @@ export const AppSidebar = () => {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              className="gap-x-4 h-10 px-4"
-              tooltip={"User info"}
-            >
-              <UserProfile />
-            </SidebarMenuButton>
+            <UserProfile />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
