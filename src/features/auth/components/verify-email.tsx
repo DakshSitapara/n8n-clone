@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
@@ -21,7 +21,7 @@ import {
   RefreshCwIcon,
 } from "lucide-react";
 
-type Status = "idle" | "verifying" | "success" | "error";
+type Status = "verifying" | "success" | "error";
 
 const AnimatedDots = () => (
   <span className="inline-flex items-center justify-center gap-1 ml-1 mb-0.5">
@@ -36,16 +36,61 @@ const AnimatedDots = () => (
 );
 
 export const VerifyEmailPage = () => {
+  const mounted = useRef(true);
+  useEffect(() => {
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
 
-  const [status, setStatus] = useState<Status>(token ? "verifying" : "idle");
+  const [status, setStatus] = useState<Status | null>(
+    token ? "verifying" : null,
+  );
   const [countdown, setCountdown] = useState(3);
   const [resending, setResending] = useState(false);
+  const [timeOut, settimeOut] = useState(0);
 
   const { data: session, isPending: sessionLoading } = authClient.useSession();
   const userEmail = session?.user?.email ?? null;
+
+  useEffect(() => {
+    if (!token) return;
+    const verify = async () => {
+      try {
+        const { error } = await authClient.verifyEmail({ query: { token } });
+        setStatus(error ? "error" : "success");
+      } catch {
+        setStatus("error");
+      }
+    };
+    verify();
+  }, [token]);
+
+  useEffect(() => {
+    if (status !== "success") return;
+    if (countdown === 0) {
+      if (mounted.current) router.push("/");
+      return;
+    }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [status, countdown, router]);
+
+  useEffect(() => {
+    if (timeOut === 0) return;
+    const t = setTimeout(() => settimeOut((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [timeOut]);
+
+  useEffect(() => {
+    if (!sessionLoading && !session && !token) {
+      router.push("/login");
+    }
+  }, [session, sessionLoading, token, router]);
 
   const resendVerification = async () => {
     if (!userEmail) {
@@ -63,45 +108,13 @@ export const VerifyEmailPage = () => {
       return;
     }
     toast.success(`Verification email sent to ${userEmail}`);
+    settimeOut(30);
   };
 
   const logout = async () => {
     await authClient.signOut();
     router.push("/login");
   };
-
-  useEffect(() => {
-    if (!token) return;
-    const verify = async () => {
-      try {
-        const { error } = await authClient.verifyEmail({ query: { token } });
-        if (error) {
-          setStatus("error");
-          return;
-        }
-        setStatus("success");
-      } catch {
-        setStatus("error");
-      }
-    };
-    verify();
-  }, [token]);
-
-  useEffect(() => {
-    if (status !== "success") return;
-    if (countdown === 0) {
-      router.push("/");
-      return;
-    }
-    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [status, countdown, router]);
-
-  useEffect(() => {
-    if (!sessionLoading && !session && !token) {
-      router.push("/login");
-    }
-  }, [session, sessionLoading, token, router]);
 
   if (token) {
     return (
@@ -239,7 +252,7 @@ export const VerifyEmailPage = () => {
 
           <Button
             onClick={resendVerification}
-            disabled={resending || !userEmail}
+            disabled={resending || !userEmail || timeOut > 0}
             className="w-full"
           >
             {resending ? (
@@ -250,7 +263,9 @@ export const VerifyEmailPage = () => {
             ) : (
               <>
                 <RefreshCwIcon className="h-4 w-4 mr-2" />
-                {userEmail ? `Resend to ${userEmail}` : "Resend link"}
+                {userEmail && timeOut > 0
+                  ? `Resend in ${timeOut}s`
+                  : `Resend to ${userEmail}`}
               </>
             )}
           </Button>

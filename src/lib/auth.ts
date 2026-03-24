@@ -8,8 +8,11 @@ import {
   resetPasswordTemplate,
   verificationEmailTemplate,
 } from "./email-templates";
+import { env } from "./env";
 
 export const auth = betterAuth({
+  baseUrl: env.BETTER_AUTH_URL,
+  secret: env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -18,9 +21,9 @@ export const auth = betterAuth({
     autoSignIn: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, token }) => {
-      const resetUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
+      const resetUrl = `${env.BETTER_AUTH_URL}/reset-password?token=${token}`;
 
-      await sendEmail({
+      void sendEmail({
         to: user.email,
         subject: "Reset your password — N8N Clone",
         html: resetPasswordTemplate(resetUrl),
@@ -29,9 +32,9 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, token }) => {
-      const verifyUrl = `${process.env.BETTER_AUTH_URL}/verify-email?token=${token}`;
+      const verifyUrl = `${env.BETTER_AUTH_URL}/verify-email?token=${token}`;
 
-      await sendEmail({
+      void sendEmail({
         to: user.email,
         subject: "Verify your email — N8N Clone",
         html: verificationEmailTemplate(verifyUrl),
@@ -41,12 +44,12 @@ export const auth = betterAuth({
   },
   socialProviders: {
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
     },
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
   plugins: [
@@ -57,11 +60,11 @@ export const auth = betterAuth({
         checkout({
           products: [
             {
-              productId: "9e775e44-82c2-4217-8f18-e883661aa6c2",
+              productId: env.POLAR_PRODUCT_ID,
               slug: "pro",
             },
           ],
-          successUrl: process.env.POLAR_SUCCESS_URL,
+          successUrl: env.POLAR_SUCCESS_URL,
           authenticatedUsersOnly: true,
         }),
         portal(),

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,7 +31,6 @@ import {
   CheckCircleIcon,
 } from "lucide-react";
 import { PasswordInput } from "./password-input";
-import { useState } from "react";
 
 const resetSchema = z
   .object({
@@ -45,21 +45,30 @@ const resetSchema = z
 type ResetFormValues = z.infer<typeof resetSchema>;
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const token = searchParams.get("token");
-
-  const [success, setSuccess] = useState(false);
-
   const form = useForm<ResetFormValues>({
     resolver: zodResolver(resetSchema),
     defaultValues: { password: "", confirmPassword: "" },
   });
 
-  const isSubmitting = form.formState.isSubmitting;
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get("token");
+
+  const [success, setSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(3);
+
+  const mounted = useRef(true);
+  useEffect(() => {
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const onSubmit = async (values: ResetFormValues) => {
-    if (!token) return;
+    if (!token) {
+      toast.error("Missing reset token.");
+      return;
+    }
     const { error } = await authClient.resetPassword({
       newPassword: values.password,
       token,
@@ -69,8 +78,19 @@ export default function ResetPasswordPage() {
       return;
     }
     setSuccess(true);
-    setTimeout(() => router.push("/login"), 2000);
   };
+
+  useEffect(() => {
+    if (!success) return;
+    if (countdown === 0) {
+      if (mounted.current) router.push("/login");
+      return;
+    }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [success, countdown, router]);
+
+  const isSubmitting = form.formState.isSubmitting;
 
   if (!token) {
     return (
@@ -111,8 +131,19 @@ export default function ResetPasswordPage() {
             </div>
             <CardTitle>Password reset!</CardTitle>
             <CardDescription>
-              Your password has been updated. Redirecting to login...
+              Your password has been updated. Redirecting to login in
+              <span className="font-medium text-foreground tabular-nums">
+                {countdown}s
+              </span>
             </CardDescription>
+            <CardContent className="pt-0">
+              <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="h-full bg-green-500 transition-all duration-1000"
+                  style={{ width: `${((3 - countdown) / 3) * 100}%` }}
+                />
+              </div>
+            </CardContent>
           </CardHeader>
         </Card>
       </div>
