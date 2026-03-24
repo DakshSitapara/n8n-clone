@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,6 +28,7 @@ import {
   FormItem,
 } from "@/components/ui/form";
 import { authClient } from "@/lib/auth-client";
+import { PasswordInput } from "./password-input";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -36,6 +39,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const router = useRouter();
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -79,6 +84,22 @@ export function LoginForm() {
     );
   };
 
+  const resendVerification = async () => {
+    if (!unverifiedEmail) return;
+    setResending(true);
+    const { error } = await authClient.sendVerificationEmail({
+      email: unverifiedEmail,
+      callbackURL: "/verify-email",
+    });
+    setResending(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Verification email sent — check your inbox");
+    router.push("/verify-email");
+  };
+
   const onSubmit = async (values: LoginFormValues) => {
     await authClient.signIn.email(
       {
@@ -92,6 +113,10 @@ export function LoginForm() {
           router.push("/");
         },
         onError: (ctx) => {
+          if (ctx.error.status === 403) {
+            setUnverifiedEmail(values.email);
+            return;
+          }
           toast.error(ctx.error.message);
         },
       },
@@ -169,16 +194,41 @@ export function LoginForm() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="********"
-                            {...field}
-                          />
+                          <PasswordInput placeholder="********" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
+                  {unverifiedEmail && (
+                    <div className="rounded-lg border border-yellow-200 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-800 p-4 flex flex-col gap-2">
+                      <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                        Email not verified
+                      </p>
+                      <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                        Please verify your email before logging in.
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={resendVerification}
+                        disabled={resending}
+                        className="w-fit"
+                      >
+                        {resending ? (
+                          <>
+                            <Loader2Icon className="h-4 w-4 animate-spin mr-2" />
+                            Sending...
+                          </>
+                        ) : (
+                          "Resend verification email"
+                        )}
+                      </Button>
+                    </div>
+                  )}
+
                   <Button type="submit" className="w-full" disabled={isPending}>
                     Login
                   </Button>

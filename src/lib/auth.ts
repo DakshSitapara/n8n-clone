@@ -4,7 +4,10 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./db";
 import { polarClient } from "./polar";
 import { sendEmail } from "./email";
-import { resetPasswordTemplate } from "./email-templates";
+import {
+  resetPasswordTemplate,
+  verificationEmailTemplate,
+} from "./email-templates";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -13,13 +16,28 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
-    sendResetPassword: async ({ user, url }) => {
-      void sendEmail({
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, token }) => {
+      const resetUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
+
+      await sendEmail({
         to: user.email,
         subject: "Reset your password — N8N Clone",
-        html: resetPasswordTemplate(url),
+        html: resetPasswordTemplate(resetUrl),
       });
     },
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, token }) => {
+      const verifyUrl = `${process.env.BETTER_AUTH_URL}/verify-email?token=${token}`;
+
+      await sendEmail({
+        to: user.email,
+        subject: "Verify your email — N8N Clone",
+        html: verificationEmailTemplate(verifyUrl),
+      });
+    },
+    autoSignInAfterVerification: true,
   },
   socialProviders: {
     github: {
