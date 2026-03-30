@@ -1,8 +1,8 @@
 procs:
-  ngrok :
-    cmd : ["npm", "run", "ngrok:dev"]
-  next : 
-    cmd : ["npm", "run", "dev"]
+    ngrok:
+        cmd: ['npm', 'run', 'ngrok:dev']
+    next:
+        cmd: ['npm', 'run', 'dev']
 
-  inngest:
-    cmd : ["npm", "run", "inngest:dev"]
+    inngest:
+        cmd: ['npm', 'run', 'inngest:dev']

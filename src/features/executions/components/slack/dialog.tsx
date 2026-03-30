@@ -1,64 +1,84 @@
-"use client";
+'use client'
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { useEffect } from 'react'
+import { Button } from '@/components/ui/button'
 
 const fromSchema = z.object({
     variableName: z
         .string()
-        .min(1, { message: "Variable name is required" })
-        .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, { message: "Variable name must start with a letter or underscore and contain only letters, numbers, and underscores" }),
-    username : z.string().optional(),
-    content : z.string().min(1, { message: "Message content is required" }).max(2000, { message: "Slack message must be less than 2000 characters" }),
-    webhookUrl : z.string().min(1, { message: "Webhook URL is required" }), 
-});
+        .min(1, { message: 'Variable name is required' })
+        .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, {
+            message:
+                'Variable name must start with a letter or underscore and contain only letters, numbers, and underscores',
+        }),
+    username: z.string().optional(),
+    content: z
+        .string()
+        .min(1, { message: 'Message content is required' })
+        .max(2000, { message: 'Slack message must be less than 2000 characters' }),
+    webhookUrl: z.string().min(1, { message: 'Webhook URL is required' }),
+})
 
-export type SlackFromValues = z.infer<typeof fromSchema>;
+export type SlackFromValues = z.infer<typeof fromSchema>
 
 interface Props {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    onSubmit: (values: z.infer<typeof fromSchema>) => void;
-    defultValue?: Partial<SlackFromValues>;
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    onSubmit: (values: z.infer<typeof fromSchema>) => void
+    defaultValue?: Partial<SlackFromValues>
 }
 
-export const SlackDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: Props) => {
-
+export const SlackDialog = ({ open, onOpenChange, onSubmit, defaultValue = {} }: Props) => {
     const form = useForm<z.infer<typeof fromSchema>>({
         resolver: zodResolver(fromSchema),
         defaultValues: {
-            variableName: defultValue.variableName || "",
-            username: defultValue.username || "",
-            content: defultValue.content || "",
-            webhookUrl: defultValue.webhookUrl || "",
+            variableName: defaultValue.variableName || '',
+            username: defaultValue.username || '',
+            content: defaultValue.content || '',
+            webhookUrl: defaultValue.webhookUrl || '',
         },
-    });
+    })
 
     // Reset from values when dialog opens with defaults
     useEffect(() => {
         if (open) {
             form.reset({
-                variableName: defultValue.variableName || "",
-                username: defultValue.username || "",
-                content: defultValue.content || "",
-                webhookUrl: defultValue.webhookUrl || "",
-            });
+                variableName: defaultValue.variableName || '',
+                username: defaultValue.username || '',
+                content: defaultValue.content || '',
+                webhookUrl: defaultValue.webhookUrl || '',
+            })
         }
-    }, [open, defultValue, form]);
+    }, [open, defaultValue, form])
 
-    const watchVariableName = form.watch("variableName") || "mySlack";
+    const watchVariableName = form.watch('variableName') || 'mySlack'
 
     const handleSubmit = (values: z.infer<typeof fromSchema>) => {
-        onSubmit(values);
-        onOpenChange(false);
-    };
+        onSubmit(values)
+        onOpenChange(false)
+    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -70,7 +90,7 @@ export const SlackDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }:
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 mt-4">
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-4 space-y-8">
                         <FormField
                             control={form.control}
                             name="variableName"
@@ -78,13 +98,11 @@ export const SlackDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }:
                                 <FormItem>
                                     <FormLabel>Variable Name</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="mySlack" 
-                                            {...field} 
-                                        />
+                                        <Input placeholder="mySlack" {...field} />
                                     </FormControl>
                                     <FormDescription>
-                                        Use this name to reference the result in other nodes: {" "} {`{{${watchVariableName}.text}}`}
+                                        Use this name to reference the result in other nodes:{' '}
+                                        {`{{${watchVariableName}.text}}`}
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -98,17 +116,18 @@ export const SlackDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }:
                                     <FormLabel>Webhook URL</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="https://slack.com/api/webhooks/..." 
+                                            placeholder="https://slack.com/api/webhooks/..."
                                             {...field}
                                         />
                                     </FormControl>
                                     <FormDescription>
-                                        Get this from Slack: Channel Settings ⟶ Integrations ⟶ Webhooks
+                                        Get this from Slack: Channel Settings ⟶ Integrations ⟶
+                                        Webhooks
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />                
+                        />
                         <FormField
                             control={form.control}
                             name="content"
@@ -116,14 +135,15 @@ export const SlackDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }:
                                 <FormItem>
                                     <FormLabel>Message Content</FormLabel>
                                     <FormControl>
-                                        <Textarea 
-                                            placeholder="Summarize: {{aiResponse.text}}" 
+                                        <Textarea
+                                            placeholder="Summarize: {{aiResponse.text}}"
                                             className="min-h-[80px] font-mono text-sm"
-                                            {...field} 
+                                            {...field}
                                         />
                                     </FormControl>
                                     <FormDescription>
-                                        The message to send. Use {"{{variables}}"} for simple values or {"{{json variable}}"} to stringify objects
+                                        The message to send. Use {'{{variables}}'} for simple values
+                                        or {'{{json variable}}'} to stringify objects
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -136,10 +156,7 @@ export const SlackDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }:
                                 <FormItem>
                                     <FormLabel>Bot Username(Optional)</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="Workflow Bot"
-                                            {...field} 
-                                        />
+                                        <Input placeholder="Workflow Bot" {...field} />
                                     </FormControl>
                                     <FormDescription>
                                         Override the webhook&#39;s default username

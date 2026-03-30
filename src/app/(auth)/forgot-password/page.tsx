@@ -1,10 +1,10 @@
-import ForgotPasswordPage from "@/features/auth/components/forgot-password";
-import { requireUnauth } from "@/lib/auth-utils";
+import ForgotPasswordPage from '@/features/auth/components/forgot-password'
+import { requireUnauth } from '@/lib/auth-utils'
 
 const Page = async () => {
-  await requireUnauth();
+    await requireUnauth()
 
-  return <ForgotPasswordPage />;
-};
+    return <ForgotPasswordPage />
+}
 
-export default Page;
+export default Page

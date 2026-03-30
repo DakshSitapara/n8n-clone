@@ -1,20 +1,27 @@
-'use client';
+'use client'
 
-import type { ReactNode } from "react";
-import { NodeToolbar, Position } from "@xyflow/react";
-import { SettingsIcon, TrashIcon } from "lucide-react";
-import { Button } from "./ui/button";
+import type { ReactNode } from 'react'
+import { NodeToolbar, Position } from '@xyflow/react'
+import { SettingsIcon, TrashIcon } from 'lucide-react'
+import { Button } from './ui/button'
 
 interface WorkflowNodeProps {
-    children: ReactNode;
-    showToolbar?: boolean;
-    onDelete?: () => void;
-    onSettings?: () => void;
-    name?: string;
-    description? : string;
+    children: ReactNode
+    showToolbar?: boolean
+    onDelete?: () => void
+    onSettings?: () => void
+    name?: string
+    description?: string
 }
 
-export function WorkflowNode({ children, showToolbar = true, onDelete, onSettings, name, description }: WorkflowNodeProps) {
+export function WorkflowNode({
+    children,
+    showToolbar = true,
+    onDelete,
+    onSettings,
+    name,
+    description,
+}: WorkflowNodeProps) {
     return (
         <>
             {showToolbar && (
@@ -29,19 +36,15 @@ export function WorkflowNode({ children, showToolbar = true, onDelete, onSetting
             )}
             {children}
             {name && (
-                <NodeToolbar 
+                <NodeToolbar
                     position={Position.Bottom}
                     isVisible
                     className="max-w-[200px] text-center"
                 >
-                    <p className="font-medium">
-                        {name}
-                    </p>
+                    <p className="font-medium">{name}</p>
                     {description && (
-                        <p className="text-muted-foreground truncate text-sm">
-                            {description}
-                        </p>
-                )}
+                        <p className="text-muted-foreground truncate text-sm">{description}</p>
+                    )}
                 </NodeToolbar>
             )}
         </>

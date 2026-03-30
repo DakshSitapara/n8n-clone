@@ -1,10 +1,10 @@
-import ResetPasswordPage from "@/features/auth/components/reset-password";
-import { requireUnauth } from "@/lib/auth-utils";
+import ResetPasswordPage from '@/features/auth/components/reset-password'
+import { requireUnauth } from '@/lib/auth-utils'
 
 const Page = async () => {
-  await requireUnauth();
+    await requireUnauth()
 
-  return <ResetPasswordPage />;
-};
+    return <ResetPasswordPage />
+}
 
-export default Page;
+export default Page

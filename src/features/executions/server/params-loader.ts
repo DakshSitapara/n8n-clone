@@ -1,4 +1,4 @@
-import { createLoader } from "nuqs/server";
-import { executionsParams } from "../params";
+import { createLoader } from 'nuqs/server'
+import { executionsParams } from '../params'
 
-export const executionsParamsLoader = createLoader(executionsParams);
+export const executionsParamsLoader = createLoader(executionsParams)

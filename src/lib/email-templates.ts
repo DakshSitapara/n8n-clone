@@ -76,7 +76,7 @@ export const resetPasswordTemplate = (url: string) => `
     </table>
   </body>
 </html>
-`;
+`
 
 export const verificationEmailTemplate = (url: string) => `
 <!DOCTYPE html>
@@ -155,4 +155,4 @@ export const verificationEmailTemplate = (url: string) => `
     </table>
   </body>
 </html>
-`;
+`

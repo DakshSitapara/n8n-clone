@@ -1,10 +1,10 @@
-import { VerifyEmailPage } from "@/features/auth/components/verify-email";
-import { requireUnauth } from "@/lib/auth-utils";
+import { VerifyEmailPage } from '@/features/auth/components/verify-email'
+import { requireUnauth } from '@/lib/auth-utils'
 
 const Page = async () => {
-  await requireUnauth();
+    await requireUnauth()
 
-  return <VerifyEmailPage />;
-};
+    return <VerifyEmailPage />
+}
 
-export default Page;
+export default Page

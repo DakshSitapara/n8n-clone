@@ -1,131 +1,134 @@
-import Handlebars from "handlebars";
-import type { NodeExecutor } from "@/features/executions/types";
-import { NonRetriableError } from "inngest";
-import { slackChannel } from "@/inngest/channels/slack";
-import { decode } from "html-entities";
-import ky from "ky";
+import Handlebars from 'handlebars'
+import type { NodeExecutor } from '@/features/executions/types'
+import { NonRetriableError } from 'inngest'
+import { slackChannel } from '@/inngest/channels/slack'
+import { decode } from 'html-entities'
+import ky from 'ky'
 
 Handlebars.registerHelper('json', (context) => {
-    const jsonString = JSON.stringify(context, null, 2);
-    const safeString = new Handlebars.SafeString(jsonString);
-    
-    return safeString;
-} );
+    const jsonString = JSON.stringify(context, null, 2)
+    const safeString = new Handlebars.SafeString(jsonString)
+
+    return safeString
+})
 
 type SlackData = {
-    variableName? : string;
-    webhookUrl? : string;
-    content? : string;
-    username? : string;
+    variableName?: string
+    webhookUrl?: string
+    content?: string
+    username?: string
 }
 
-export const slackExecutor: NodeExecutor<SlackData> = async ({ data, nodeId, context, step, publish }) => {
-    
+export const slackExecutor: NodeExecutor<SlackData> = async ({
+    data,
+    nodeId,
+    context,
+    step,
+    publish,
+}) => {
     await publish(
         slackChannel().status({
             nodeId,
-            status: "loading",
+            status: 'loading',
         })
-    );
+    )
 
-    if(!data.variableName) {
+    if (!data.variableName) {
         await publish(
             slackChannel().status({
                 nodeId,
-                status: "error",
+                status: 'error',
             })
-        );
-        throw new NonRetriableError("Slack node: Variable name is missing.");
+        )
+        throw new NonRetriableError('Slack node: Variable name is missing.')
     }
 
-    if(!data.webhookUrl) {
+    if (!data.webhookUrl) {
         await publish(
             slackChannel().status({
                 nodeId,
-                status: "error",
+                status: 'error',
             })
-        );
-        throw new NonRetriableError("Slack node: Webhook URL is missing.");
+        )
+        throw new NonRetriableError('Slack node: Webhook URL is missing.')
     }
-    
-    if(!data.content) {
+
+    if (!data.content) {
         await publish(
             slackChannel().status({
                 nodeId,
-                status: "error",
+                status: 'error',
             })
-        );
-        throw new NonRetriableError("Slack node: Content is missing.");
+        )
+        throw new NonRetriableError('Slack node: Content is missing.')
     }
 
-    if(!data.username) {
+    if (!data.username) {
         await publish(
             slackChannel().status({
                 nodeId,
-                status: "error",
+                status: 'error',
             })
-        );
-        throw new NonRetriableError("Slack node: username is missing.");
+        )
+        throw new NonRetriableError('Slack node: username is missing.')
     }
 
-    const rawContent = Handlebars.compile(data.content)(context);
-    const content = decode(rawContent);
-    const username = data.username ? decode(Handlebars.compile(data.username)(context)) : undefined;
+    const rawContent = Handlebars.compile(data.content)(context)
+    const content = decode(rawContent)
+    const username = data.username ? decode(Handlebars.compile(data.username)(context)) : undefined
 
     try {
-        const result = await step.run("Slack-webhook", async () => {
-            
-            if(!data.webhookUrl) {
+        const result = await step.run('Slack-webhook', async () => {
+            if (!data.webhookUrl) {
                 await publish(
                     slackChannel().status({
                         nodeId,
-                        status: "error",
+                        status: 'error',
                     })
-                );
-                throw new NonRetriableError("Slack node: Webhook URL is missing.");
+                )
+                throw new NonRetriableError('Slack node: Webhook URL is missing.')
             }
 
             await ky.post(data.webhookUrl, {
                 json: {
-                    content : content.slice(0, 2000),
-                    username
+                    content: content.slice(0, 2000),
+                    username,
                 },
-            });
+            })
 
-        if(!data.variableName) {
-            await publish(
-                slackChannel().status({
-                    nodeId,
-                    status: "error",
-                })
-            );
-            throw new NonRetriableError("Slack node: Variable name is missing.");
-        };
+            if (!data.variableName) {
+                await publish(
+                    slackChannel().status({
+                        nodeId,
+                        status: 'error',
+                    })
+                )
+                throw new NonRetriableError('Slack node: Variable name is missing.')
+            }
 
             return {
                 ...context,
                 [data.variableName]: {
                     messageContent: content.slice(0, 2000),
-                }
+                },
             }
         })
 
         await publish(
             slackChannel().status({
                 nodeId,
-                status: "success",
+                status: 'success',
             })
-        );
+        )
 
-        return result;
-
+        return result
     } catch (error) {
-            await publish(
-                slackChannel().status({
-                    nodeId,
-                    status: "error",
-                })
-            );
-            throw error;
-        }
-    };
+        await publish(
+            slackChannel().status({
+                nodeId,
+                status: 'error',
+            })
+        )
+        throw error
+    }
+}

@@ -1,5 +1,5 @@
-import { prefetch, trpc } from "@/trpc/server";
+import { prefetch, trpc } from '@/trpc/server'
 
 export const prefetchUser = () => {
-  return prefetch(trpc.user.getOne.queryOptions());
-};
+    return prefetch(trpc.user.getOne.queryOptions())
+}

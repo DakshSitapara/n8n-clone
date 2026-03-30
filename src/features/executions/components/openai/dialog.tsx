@@ -1,83 +1,105 @@
-"use client";
+'use client'
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectTrigger, SelectValue, SelectItem,SelectContent } from "@/components/ui/select";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
-import { CredentialType } from "@/generated/prisma/enums";
-import Image from "next/image";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import {
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectItem,
+    SelectContent,
+} from '@/components/ui/select'
+import z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { useCredentialsByType } from '@/features/credentials/hooks/use-credentials'
+import { CredentialType } from '@/generated/prisma/enums'
+import Image from 'next/image'
 
 export const AVAILABLE_MODELS = [
-  { label: "GPT-5.2", value: "gpt-5.2" },
-  { label: "GPT-5.1", value: "gpt-5.1" },
-  { label: "GPT-5",   value: "gpt-5" },
-  { label: "GPT-5 Mini", value: "gpt-5-mini" },
-] as const;
+    { label: 'GPT-5.2', value: 'gpt-5.2' },
+    { label: 'GPT-5.1', value: 'gpt-5.1' },
+    { label: 'GPT-5', value: 'gpt-5' },
+    { label: 'GPT-5 Mini', value: 'gpt-5-mini' },
+] as const
 
 const fromSchema = z.object({
     variableName: z
         .string()
-        .min(1, { message: "Variable name is required" })
-        .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, { message: "Variable name must start with a letter or underscore and contain only letters, numbers, and underscores" }),
-    credentialId: z.string().min(1, { message: "Credential ID is required" }),
-    model: z.string().min(1, { message: "Model is required" }),
+        .min(1, { message: 'Variable name is required' })
+        .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, {
+            message:
+                'Variable name must start with a letter or underscore and contain only letters, numbers, and underscores',
+        }),
+    credentialId: z.string().min(1, { message: 'Credential ID is required' }),
+    model: z.string().min(1, { message: 'Model is required' }),
     systemPrompt: z.string().optional(),
-    userPrompt: z.string().min(1, { message: "User prompt is required" }),
-});
+    userPrompt: z.string().min(1, { message: 'User prompt is required' }),
+})
 
-export type OpenAiFromValues = z.infer<typeof fromSchema>;
+export type OpenAiFromValues = z.infer<typeof fromSchema>
 
 interface Props {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    onSubmit: (values: z.infer<typeof fromSchema>) => void;
-    defultValue?: Partial<OpenAiFromValues>;
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    onSubmit: (values: z.infer<typeof fromSchema>) => void
+    defaultValue?: Partial<OpenAiFromValues>
 }
 
-export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }: Props) => {
-
-        const { 
-            data: credentials , 
-            isLoading: isLoadingCredentials 
-        } = useCredentialsByType(CredentialType.OPENAI);
+export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defaultValue = {} }: Props) => {
+    const { data: credentials, isLoading: isLoadingCredentials } = useCredentialsByType(
+        CredentialType.OPENAI
+    )
 
     const form = useForm<z.infer<typeof fromSchema>>({
         resolver: zodResolver(fromSchema),
         defaultValues: {
-            variableName: defultValue.variableName || "",
-            credentialId: defultValue.credentialId || "",
-            model: defultValue.model || AVAILABLE_MODELS[0].value,
-            systemPrompt: defultValue.systemPrompt || "",
-            userPrompt: defultValue.userPrompt || "",
+            variableName: defaultValue.variableName || '',
+            credentialId: defaultValue.credentialId || '',
+            model: defaultValue.model || AVAILABLE_MODELS[0].value,
+            systemPrompt: defaultValue.systemPrompt || '',
+            userPrompt: defaultValue.userPrompt || '',
         },
-    });
+    })
 
     // Reset from values when dialog opens with defaults
     useEffect(() => {
         if (open) {
             form.reset({
-                variableName: defultValue.variableName || "",
-                credentialId: defultValue.credentialId || "",
-                model: defultValue.model || AVAILABLE_MODELS[0].value,
-                systemPrompt: defultValue.systemPrompt || "",
-                userPrompt: defultValue.userPrompt || "",
-            });
+                variableName: defaultValue.variableName || '',
+                credentialId: defaultValue.credentialId || '',
+                model: defaultValue.model || AVAILABLE_MODELS[0].value,
+                systemPrompt: defaultValue.systemPrompt || '',
+                userPrompt: defaultValue.userPrompt || '',
+            })
         }
-    }, [open, defultValue, form]);
+    }, [open, defaultValue, form])
 
-    const watchVariableName = form.watch("variableName") || "myOpenAi";
+    const watchVariableName = form.watch('variableName') || 'myOpenAi'
 
     const handleSubmit = (values: z.infer<typeof fromSchema>) => {
-        onSubmit(values);
-        onOpenChange(false);
-    };
+        onSubmit(values)
+        onOpenChange(false)
+    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -89,7 +111,7 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 mt-4">
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-4 space-y-8">
                         <FormField
                             control={form.control}
                             name="variableName"
@@ -97,13 +119,11 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
                                 <FormItem>
                                     <FormLabel>Variable Name</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="myOpenAi" 
-                                            {...field} 
-                                        />
+                                        <Input placeholder="myOpenAi" {...field} />
                                     </FormControl>
                                     <FormDescription>
-                                        Use this name to reference the result in other nodes: {" "} {`{{${watchVariableName}.text}}`}
+                                        Use this name to reference the result in other nodes:{' '}
+                                        {`{{${watchVariableName}.text}}`}
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -115,7 +135,7 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>OpenAI Credential</FormLabel>
-                                    <Select 
+                                    <Select
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}
                                         disabled={isLoadingCredentials || !credentials?.length}
@@ -127,10 +147,18 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
                                         </FormControl>
                                         <SelectContent>
                                             {credentials?.map((credential) => (
-                                                <SelectItem key={credential.id} value={credential.id}>
+                                                <SelectItem
+                                                    key={credential.id}
+                                                    value={credential.id}
+                                                >
                                                     <div className="flex items-center gap-2">
-                                                    <Image src='/logos/openai.svg' alt="Gemini" width={16} height={16} /> 
-                                                    {credential.name}
+                                                        <Image
+                                                            src="/logos/openai.svg"
+                                                            alt="Gemini"
+                                                            width={16}
+                                                            height={16}
+                                                        />
+                                                        {credential.name}
                                                     </div>
                                                 </SelectItem>
                                             ))}
@@ -139,14 +167,14 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />                 
+                        />
                         <FormField
                             control={form.control}
                             name="model"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Model</FormLabel>
-                                    <Select 
+                                    <Select
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}
                                     >
@@ -177,14 +205,16 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
                                 <FormItem>
                                     <FormLabel>System Prompt (Optional)</FormLabel>
                                     <FormControl>
-                                        <Textarea 
-                                            placeholder="You are a helpful assistant." 
+                                        <Textarea
+                                            placeholder="You are a helpful assistant."
                                             className="min-h-[80px] font-mono text-sm"
-                                            {...field} 
+                                            {...field}
                                         />
                                     </FormControl>
                                     <FormDescription>
-                                        Sents the behavior of the assistant. Use {"{{variables}}"} for simple values or {"{{json variable}}"} to stringify objects
+                                        Sents the behavior of the assistant. Use {'{{variables}}'}{' '}
+                                        for simple values or {'{{json variable}}'} to stringify
+                                        objects
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -197,14 +227,15 @@ export const OpenAiDialog = ({ open, onOpenChange, onSubmit, defultValue = {}, }
                                 <FormItem>
                                     <FormLabel>User Prompt</FormLabel>
                                     <FormControl>
-                                        <Textarea 
-                                            placeholder="Summarize this text: {{json httpResponse.data}}" 
+                                        <Textarea
+                                            placeholder="Summarize this text: {{json httpResponse.data}}"
                                             className="min-h-[120px] font-mono text-sm"
-                                            {...field} 
+                                            {...field}
                                         />
                                     </FormControl>
                                     <FormDescription>
-                                        The prompt to send to the AI. Use {"{{variables}}"} for simple values or {"{{json variable}}"} to stringify objects
+                                        The prompt to send to the AI. Use {'{{variables}}'} for
+                                        simple values or {'{{json variable}}'} to stringify objects
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>

@@ -1,65 +1,73 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
-import { CredentialType } from "@/generated/prisma/enums";
-import { useParams } from "next/navigation";
-import { toast } from "sonner";
-import { Select, SelectTrigger, SelectValue, SelectItem,SelectContent } from "@/components/ui/select";
-import Image from "next/image";
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { useCredentialsByType } from '@/features/credentials/hooks/use-credentials'
+import { CredentialType } from '@/generated/prisma/enums'
+import { useParams } from 'next/navigation'
+import { toast } from 'sonner'
+import {
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectItem,
+    SelectContent,
+} from '@/components/ui/select'
+import Image from 'next/image'
 
 interface Props {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
+    open: boolean
+    onOpenChange: (open: boolean) => void
 }
 
 export const TelegramTriggerDialog = ({ open, onOpenChange }: Props) => {
+    const [selectedCredential, setSelectedCredential] = useState<string | null>(null)
+    const [isSettingWebhook, setIsSettingWebhook] = useState(false)
 
-const [selectedCredential, setSelectedCredential] = useState<string | null>(null);
-const [isSettingWebhook, setIsSettingWebhook] = useState(false);
+    const params = useParams()
+    const workflowId = params.workflowId as string
 
-    
-    const params = useParams();
-    const workflowId = params.workflowId as string;
+    const { data: credentials, isLoading: isLoadingCredentials } = useCredentialsByType(
+        CredentialType.TELEGRAM
+    )
 
-    const { 
-        data: credentials , 
-        isLoading: isLoadingCredentials 
-    } = useCredentialsByType(CredentialType.TELEGRAM);
-
-    const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
-    const webhookUrl = `${baseUrl}/api/webhooks/telegram?workflowId=${workflowId}`;
-
+    const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000').replace(/\/$/, '')
+    const webhookUrl = `${baseUrl}/api/webhooks/telegram?workflowId=${workflowId}`
 
     const handleSetWebhook = async () => {
-            try {
-                setIsSettingWebhook(true);
+        try {
+            setIsSettingWebhook(true)
 
-                const res = await fetch("/api/webhooks/telegram/set-webhook", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
+            const res = await fetch('/api/webhooks/telegram/set-webhook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     credentialId: selectedCredential,
                     webhookUrl,
-                    }),
-                });
+                }),
+            })
 
-                const json = await res.json();
+            const json = await res.json()
 
-                if (!json.success) {
-                    throw new Error(json.message);
-                }
+            if (!json.success) {
+                throw new Error(json.message)
+            }
 
-                toast.success("Telegram webhook configured successfully!");
-            } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Failed to set webhook");
-            } finally {
-                setIsSettingWebhook(false);
-                }
+            toast.success('Telegram webhook configured successfully!')
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Failed to set webhook')
+        } finally {
+            setIsSettingWebhook(false)
         }
+    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -67,7 +75,8 @@ const [isSettingWebhook, setIsSettingWebhook] = useState(false);
                 <DialogHeader>
                     <DialogTitle>Telegram Trigger Configuration</DialogTitle>
                     <DialogDescription>
-                        Configure this webhook URL in your Telegram Dashboard to trigger this workflow on events.
+                        Configure this webhook URL in your Telegram Dashboard to trigger this
+                        workflow on events.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -76,105 +85,111 @@ const [isSettingWebhook, setIsSettingWebhook] = useState(false);
 
                         <div className="flex gap-2">
                             <Select
-                                defaultValue={selectedCredential || ""}
-                                disabled={isLoadingCredentials || isSettingWebhook || credentials?.length === 0}
+                                defaultValue={selectedCredential || ''}
+                                disabled={
+                                    isLoadingCredentials ||
+                                    isSettingWebhook ||
+                                    credentials?.length === 0
+                                }
                                 onValueChange={setSelectedCredential}
                             >
-                            <SelectTrigger id="credential" className="w-full">
-                                <SelectValue placeholder="Select a credential" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {credentials?.map((credential) => (
-                                <SelectItem key={credential.id} value={credential.id}>
-                                    <div className="flex items-center gap-2">
-                                    <Image
-                                        src="/logos/telegram.svg"
-                                        alt="Telegram"
-                                        width={16}
-                                        height={16}
-                                    />
-                                    {credential.name}
-                                    </div>
-                                </SelectItem>
-                                ))}
-                            </SelectContent>
+                                <SelectTrigger id="credential" className="w-full">
+                                    <SelectValue placeholder="Select a credential" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {credentials?.map((credential) => (
+                                        <SelectItem key={credential.id} value={credential.id}>
+                                            <div className="flex items-center gap-2">
+                                                <Image
+                                                    src="/logos/telegram.svg"
+                                                    alt="Telegram"
+                                                    width={16}
+                                                    height={16}
+                                                />
+                                                {credential.name}
+                                            </div>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
                             </Select>
 
                             <Button
-                            type="button"
-                            disabled={!selectedCredential || isSettingWebhook}
-                            onClick={handleSetWebhook}
+                                type="button"
+                                disabled={!selectedCredential || isSettingWebhook}
+                                onClick={handleSetWebhook}
                             >
-                            {isSettingWebhook ? "Setting Webhook..." : "Set Webhook"}
+                                {isSettingWebhook ? 'Setting Webhook...' : 'Set Webhook'}
                             </Button>
                         </div>
                     </div>
 
-                    <div className="rounded-lg bg-muted p-4 space-y-2">
-                    <h4 className="font-medium text-sm">
-                        Setup Instructions
-                    </h4>
+                    <div className="bg-muted space-y-2 rounded-lg p-4">
+                        <h4 className="text-sm font-medium">Setup Instructions</h4>
 
-                    <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                        <li>Create a Telegram bot using <code>@BotFather</code></li>
-                        <li>Copy your bot token</li>
-                        <li>Select a Telegram credential above</li>
-                        <li>Click <strong>Set Webhook</strong> to automatically register the webhook</li>
-                        <li>Open Telegram and send <code>/start</code> to your bot</li>
-                        <li>Every message sent to the bot will now trigger this workflow</li>
-                    </ol>
-                    </div>
-                   
-                    <div className="rounded-lg bg-muted p-4 space-y-2">
-                    <h4 className="font-medium text-sm">
-                        Available Variables
-                    </h4>
-
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                        <li>
-                        <code className="bg-background px-1 py-0.5 rounded">
-                            {"{{telegram.text}}"}
-                        </code>
-                        {" "}– Message text sent by the user
-                        </li>
-
-                        <li>
-                        <code className="bg-background px-1 py-0.5 rounded">
-                            {"{{telegram.chatId}}"}
-                        </code>
-                        {" "}– Chat ID of the conversation
-                        </li>
-
-                        <li>
-                        <code className="bg-background px-1 py-0.5 rounded">
-                            {"{{telegram.from.username}}"}
-                        </code>
-                        {" "}– Username of the sender
-                        </li>
-
-                        <li>
-                        <code className="bg-background px-1 py-0.5 rounded">
-                            {"{{telegram.from.firstName}}"}
-                        </code>
-                        {" "}– First name of the sender
-                        </li>
-
-                        <li>
-                        <code className="bg-background px-1 py-0.5 rounded">
-                            {"{{telegram.from.id}}"}
-                        </code>
-                        {" "}– Telegram user ID
-                        </li>
-
-                        <li>
-                        <code className="bg-background px-1 py-0.5 rounded">
-                            {"{{json telegram}}"}
-                        </code>
-                        {" "}– Full Telegram trigger payload as JSON
-                        </li>
-                    </ul>
+                        <ol className="text-muted-foreground list-inside list-decimal space-y-1 text-sm">
+                            <li>
+                                Create a Telegram bot using <code>@BotFather</code>
+                            </li>
+                            <li>Copy your bot token</li>
+                            <li>Select a Telegram credential above</li>
+                            <li>
+                                Click <strong>Set Webhook</strong> to automatically register the
+                                webhook
+                            </li>
+                            <li>
+                                Open Telegram and send <code>/start</code> to your bot
+                            </li>
+                            <li>Every message sent to the bot will now trigger this workflow</li>
+                        </ol>
                     </div>
 
+                    <div className="bg-muted space-y-2 rounded-lg p-4">
+                        <h4 className="text-sm font-medium">Available Variables</h4>
+
+                        <ul className="text-muted-foreground space-y-1 text-sm">
+                            <li>
+                                <code className="bg-background rounded px-1 py-0.5">
+                                    {'{{telegram.text}}'}
+                                </code>{' '}
+                                – Message text sent by the user
+                            </li>
+
+                            <li>
+                                <code className="bg-background rounded px-1 py-0.5">
+                                    {'{{telegram.chatId}}'}
+                                </code>{' '}
+                                – Chat ID of the conversation
+                            </li>
+
+                            <li>
+                                <code className="bg-background rounded px-1 py-0.5">
+                                    {'{{telegram.from.username}}'}
+                                </code>{' '}
+                                – Username of the sender
+                            </li>
+
+                            <li>
+                                <code className="bg-background rounded px-1 py-0.5">
+                                    {'{{telegram.from.firstName}}'}
+                                </code>{' '}
+                                – First name of the sender
+                            </li>
+
+                            <li>
+                                <code className="bg-background rounded px-1 py-0.5">
+                                    {'{{telegram.from.id}}'}
+                                </code>{' '}
+                                – Telegram user ID
+                            </li>
+
+                            <li>
+                                <code className="bg-background rounded px-1 py-0.5">
+                                    {'{{json telegram}}'}
+                                </code>{' '}
+                                – Full Telegram trigger payload as JSON
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

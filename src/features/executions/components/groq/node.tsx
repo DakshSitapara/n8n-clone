@@ -1,67 +1,67 @@
-"use client";
+'use client'
 
-import { useReactFlow, type Node, type NodeProps } from "@xyflow/react";
-import { memo, useState } from "react";
-import { BaseExecutionNode } from "../base-execution-node";
-import { AVAILABLE_MODELS, GroqDialog, GroqFromValues } from "./dialog";
-import { useNodeStatus } from "../../hooks/use-node-status";
-import { fetchGroqRealtimeToken } from "./actions";
-import { GROQ_CHANNEL_NAME } from "@/inngest/channels/groq";
+import { useReactFlow, type Node, type NodeProps } from '@xyflow/react'
+import { memo, useState } from 'react'
+import { BaseExecutionNode } from '../base-execution-node'
+import { AVAILABLE_MODELS, GroqDialog, GroqFromValues } from './dialog'
+import { useNodeStatus } from '../../hooks/use-node-status'
+import { fetchGroqRealtimeToken } from './actions'
+import { GROQ_CHANNEL_NAME } from '@/inngest/channels/groq'
 
 type GroqNodeData = {
-    variableName?: string;
-    credentialId?: string;
-    model?: string; 
-    systemPrompt?: string;
-    userPrompt?: string;
-};
+    variableName?: string
+    credentialId?: string
+    model?: string
+    systemPrompt?: string
+    userPrompt?: string
+}
 
-type GroqNodeType = Node<GroqNodeData>;
+type GroqNodeType = Node<GroqNodeData>
 
-export const GroqNode = memo((props : NodeProps<GroqNodeType>) => {
-    
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const { setNodes } = useReactFlow();
-    
+export const GroqNode = memo((props: NodeProps<GroqNodeType>) => {
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const { setNodes } = useReactFlow()
+
     const nodeStatus = useNodeStatus({
         nodeId: props.id,
         channel: GROQ_CHANNEL_NAME,
-        topic: "status",
+        topic: 'status',
         refreshToken: fetchGroqRealtimeToken,
-    });
+    })
 
     const handleOpenSettings = () => {
-        setDialogOpen(true);
+        setDialogOpen(true)
     }
 
-    const handleSubmit = (values : GroqFromValues) => {
-        setNodes((nodes) => 
+    const handleSubmit = (values: GroqFromValues) => {
+        setNodes((nodes) =>
             nodes.map((node) => {
-                if(node.id === props.id) {
+                if (node.id === props.id) {
                     return {
                         ...node,
                         data: {
                             ...node.data,
                             ...values,
-                        }                        
+                        },
                     }
                 }
-                return node;
+                return node
             })
         )
     }
-    const nodeData = props.data;
-    const description = nodeData?.userPrompt ? `${nodeData.model || AVAILABLE_MODELS[0].value } : ${nodeData.userPrompt.slice(0, 50)}...` : "Not configured";
+    const nodeData = props.data
+    const description = nodeData?.userPrompt
+        ? `${nodeData.model || AVAILABLE_MODELS[0].value} : ${nodeData.userPrompt.slice(0, 50)}...`
+        : 'Not configured'
 
-
-    return(
+    return (
         <>
-        <GroqDialog
-            open={dialogOpen} 
-            onOpenChange={setDialogOpen}
-            onSubmit={handleSubmit}
-            defultValue={nodeData}
-        />
+            <GroqDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                onSubmit={handleSubmit}
+                defaultValue={nodeData}
+            />
             <BaseExecutionNode
                 {...props}
                 id={props.id}
@@ -76,4 +76,4 @@ export const GroqNode = memo((props : NodeProps<GroqNodeType>) => {
     )
 })
 
-GroqNode.displayName = "GroqNode";
+GroqNode.displayName = 'GroqNode'

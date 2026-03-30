@@ -1,38 +1,39 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { ExecutionStatus } from "@/generated/prisma/enums";
-import { CheckCircle2Icon, ClockIcon, Loader2Icon, XCircleIcon } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader,CardTitle } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useSuspenseExecution } from "../hooks/use-executions";
+import { useState } from 'react'
+import { ExecutionStatus } from '@/generated/prisma/enums'
+import { CheckCircle2Icon, ClockIcon, Loader2Icon, XCircleIcon } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { useSuspenseExecution } from '../hooks/use-executions'
 
 const getStatusIcon = (status: ExecutionStatus) => {
-    switch(status) {
+    switch (status) {
         case ExecutionStatus.SUCCESS:
-            return <CheckCircle2Icon className="size-5 text-green-600" />;
+            return <CheckCircle2Icon className="size-5 text-green-600" />
         case ExecutionStatus.FAILED:
-            return <XCircleIcon className="size-5 text-red-600" />;
+            return <XCircleIcon className="size-5 text-red-600" />
         case ExecutionStatus.RUNNING:
-            return <Loader2Icon className="size-5 text-blue-600 animate-spin" />;
+            return <Loader2Icon className="size-5 animate-spin text-blue-600" />
         default:
-            return <ClockIcon className="size-5 text-muted-foreground" />
+            return <ClockIcon className="text-muted-foreground size-5" />
     }
 }
 
 const fromatStatus = (status: ExecutionStatus) => {
-    return status.charAt(0) + status.slice(1).toLowerCase();
+    return status.charAt(0) + status.slice(1).toLowerCase()
 }
 
-export const ExecutionView = ({ executionId } : { executionId: string }) => {
+export const ExecutionView = ({ executionId }: { executionId: string }) => {
+    const { data: execution } = useSuspenseExecution(executionId)
+    const [showStacksTrace, setShowStacksTrace] = useState(false)
 
-    const { data: execution } = useSuspenseExecution(executionId);
-    const [showStacksTrace, setShowStacksTrace] = useState(false);
-
-    const duration = execution.completedAt ? Math.round((execution.completedAt.getTime() - execution.startedAt.getTime()) / 1000) : null;
+    const duration = execution.completedAt
+        ? Math.round((execution.completedAt.getTime() - execution.startedAt.getTime()) / 1000)
+        : null
 
     return (
         <Card className="shadow-none">
@@ -40,65 +41,69 @@ export const ExecutionView = ({ executionId } : { executionId: string }) => {
                 <div className="flex items-center gap-3">
                     {getStatusIcon(execution.status)}
                     <div>
-                        <CardTitle>
-                            {fromatStatus(execution.status)}
-                        </CardTitle>
-                        <CardDescription>
-                            Execution for {execution.workflow.name}
-                        </CardDescription>
+                        <CardTitle>{fromatStatus(execution.status)}</CardTitle>
+                        <CardDescription>Execution for {execution.workflow.name}</CardDescription>
                     </div>
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <p className="text-sm font-medium text-muted-foreground">
-                            Workflow
-                        </p>
+                        <p className="text-muted-foreground text-sm font-medium">Workflow</p>
                         <Link
-                            prefetch 
-                            className="text-sm text-primary hover:underline" 
+                            prefetch
+                            className="text-primary text-sm hover:underline"
                             href={`/workflows/${execution.workflowId}`}
                         >
                             {execution.workflow.name}
                         </Link>
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-muted-foreground">States</p>
+                        <p className="text-muted-foreground text-sm font-medium">States</p>
                         <p className="text-sm">{fromatStatus(execution.status)}</p>
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-muted-foreground">Started</p>
-                        <p className="text-sm">{formatDistanceToNow(execution.startedAt, { addSuffix: true })}</p>
+                        <p className="text-muted-foreground text-sm font-medium">Started</p>
+                        <p className="text-sm">
+                            {formatDistanceToNow(execution.startedAt, { addSuffix: true })}
+                        </p>
                     </div>
-                    {execution.completedAt ? <div>
-                        <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                        <p className="text-sm">{formatDistanceToNow(execution.completedAt, { addSuffix: true })}</p>
-                    </div> : null}
-                    {duration !== null ?( <div>
-                        <p className="text-sm font-medium text-muted-foreground">Duration</p>
-                        <p className="text-sm">{duration}s</p>
-                    </div>) : null}
+                    {execution.completedAt ? (
+                        <div>
+                            <p className="text-muted-foreground text-sm font-medium">Completed</p>
+                            <p className="text-sm">
+                                {formatDistanceToNow(execution.completedAt, { addSuffix: true })}
+                            </p>
+                        </div>
+                    ) : null}
+                    {duration !== null ? (
+                        <div>
+                            <p className="text-muted-foreground text-sm font-medium">Duration</p>
+                            <p className="text-sm">{duration}s</p>
+                        </div>
+                    ) : null}
                     <div>
-                        <p className="text-sm font-medium text-muted-foreground">Event Id</p>
+                        <p className="text-muted-foreground text-sm font-medium">Event Id</p>
                         <p className="text-sm">{execution.inngestEventId}</p>
                     </div>
                 </div>
 
-                    {execution.error && (
-                    <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-md space-y-3">
+                {execution.error && (
+                    <div className="mt-6 space-y-3 rounded-md bg-red-50 p-4 dark:bg-red-900/20">
                         <div>
-                        <p className="text-sm font-medium text-red-900 mb-2">Error</p>
-                        <p className="text-sm text-red-800 font-mono truncate">{execution.error}</p>
-                        {execution.error.length > 100 && (
-                            <div className="mt-2">
-                                <p className="text-xs text-muted-foreground font-medium">
-                                    <span className="font-semibold">{"{ "}</span> 
-                                    Click on the Show Stack Trace to see the full stack trace
-                                    <span className="font-semibold">{" }"}</span>
-                                </p>
-                            </div>
-                        )}
+                            <p className="mb-2 text-sm font-medium text-red-900">Error</p>
+                            <p className="truncate font-mono text-sm text-red-800">
+                                {execution.error}
+                            </p>
+                            {execution.error.length > 100 && (
+                                <div className="mt-2">
+                                    <p className="text-muted-foreground text-xs font-medium">
+                                        <span className="font-semibold">{'{ '}</span>
+                                        Click on the Show Stack Trace to see the full stack trace
+                                        <span className="font-semibold">{' }'}</span>
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         {execution.errorStack && (
@@ -109,26 +114,25 @@ export const ExecutionView = ({ executionId } : { executionId: string }) => {
                                         size="sm"
                                         className="text-red-900 hover:bg-red-50"
                                     >
-                                        {showStacksTrace ? "Hide Stack Trace" : "Show Stack Trace"}
+                                        {showStacksTrace ? 'Hide Stack Trace' : 'Show Stack Trace'}
                                     </Button>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
-                                    <pre className="text-xs text-red-800 font-mono overflow-auto mt-2 p-2 bg-red-100 dark:bg-red-950/20 rounded">
+                                    <pre className="mt-2 overflow-auto rounded bg-red-100 p-2 font-mono text-xs text-red-800 dark:bg-red-950/20">
                                         {execution.errorStack}
                                     </pre>
                                 </CollapsibleContent>
-                             </Collapsible>
+                            </Collapsible>
                         )}
-
                     </div>
-                    )}
-                
+                )}
+
                 {execution.output && (
-                    <div className="mt-6 p-4 bg-muted rounded-md">
-                            <p className="text-sm font-medium mb-2">Output</p>
-                            <pre className="text-xs font-mono overflow-auto">
-                                {JSON.stringify(execution.output, null, 2)}
-                            </pre>
+                    <div className="bg-muted mt-6 rounded-md p-4">
+                        <p className="mb-2 text-sm font-medium">Output</p>
+                        <pre className="overflow-auto font-mono text-xs">
+                            {JSON.stringify(execution.output, null, 2)}
+                        </pre>
                     </div>
                 )}
             </CardContent>

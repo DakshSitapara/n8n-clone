@@ -1,17 +1,17 @@
-import { NodeType } from "@/generated/prisma/enums";
-import { NodeExecutor } from "../types";
-import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
-import { httpRequestExecutor } from "../components/http-request/executor";
-import { googleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
-import { stripeTriggerExecutor } from "@/features/triggers/components/stripe-trigger/executor";
-import { geminiExecutor } from "../components/gemini/executor";
-import { openaiExecutor } from "../components/openai/executor";
-import { groqExecutor } from "../components/groq/executor";
-import { anthropicExecutor } from "../components/anthropic/executor";
-import { discordExecutor } from "../components/discord/executor";
-import { slackExecutor } from "../components/slack/executor";
-import { telegramExecutor } from "../components/telegram/executor";
-import { telegramTriggerExecutor } from "@/features/triggers/components/telegram-trigger/executor";
+import { NodeType } from '@/generated/prisma/enums'
+import { NodeExecutor } from '../types'
+import { manualTriggerExecutor } from '@/features/triggers/components/manual-trigger/executor'
+import { httpRequestExecutor } from '../components/http-request/executor'
+import { googleFormTriggerExecutor } from '@/features/triggers/components/google-form-trigger/executor'
+import { stripeTriggerExecutor } from '@/features/triggers/components/stripe-trigger/executor'
+import { geminiExecutor } from '../components/gemini/executor'
+import { openaiExecutor } from '../components/openai/executor'
+import { groqExecutor } from '../components/groq/executor'
+import { anthropicExecutor } from '../components/anthropic/executor'
+import { discordExecutor } from '../components/discord/executor'
+import { slackExecutor } from '../components/slack/executor'
+import { telegramExecutor } from '../components/telegram/executor'
+import { telegramTriggerExecutor } from '@/features/triggers/components/telegram-trigger/executor'
 
 export const executorRegistry: Record<NodeType, NodeExecutor> = {
     [NodeType.MANUAL_TRIGGER]: manualTriggerExecutor,
@@ -26,13 +26,13 @@ export const executorRegistry: Record<NodeType, NodeExecutor> = {
     [NodeType.DISCORD]: discordExecutor,
     [NodeType.SLACK]: slackExecutor,
     [NodeType.TELEGRAM]: telegramExecutor,
-    [NodeType.TELEGRAM_TRIGGER]: telegramTriggerExecutor
-};
+    [NodeType.TELEGRAM_TRIGGER]: telegramTriggerExecutor,
+}
 
-export const getExecutor = (type: NodeType) : NodeExecutor => {
-    const executor = executorRegistry[type];
+export const getExecutor = (type: NodeType): NodeExecutor => {
+    const executor = executorRegistry[type]
     if (!executor) {
-        throw new Error(`No executor found for type ${type}`);
+        throw new Error(`No executor found for type ${type}`)
     }
-    return executor;
-};
+    return executor
+}

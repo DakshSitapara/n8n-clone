@@ -1,18 +1,18 @@
-import Handlebars from "handlebars";
-import type { NodeExecutor } from "@/features/executions/types";
-import { NonRetriableError } from "inngest";
-import { generateText } from "ai";
-import { createGroq } from '@ai-sdk/groq';
-import { groqChannel } from "@/inngest/channels/groq";
-import prisma from "@/lib/db";
-import { decrypt } from "@/lib/encryption";
+import Handlebars from 'handlebars'
+import type { NodeExecutor } from '@/features/executions/types'
+import { NonRetriableError } from 'inngest'
+import { generateText } from 'ai'
+import { createGroq } from '@ai-sdk/groq'
+import { groqChannel } from '@/inngest/channels/groq'
+import prisma from '@/lib/db'
+import { decrypt } from '@/lib/encryption'
 
 Handlebars.registerHelper('json', (context) => {
-    const jsonString = JSON.stringify(context, null, 2);
-    const safeString = new Handlebars.SafeString(jsonString);
-    
-    return safeString;
-} );
+    const jsonString = JSON.stringify(context, null, 2)
+    const safeString = new Handlebars.SafeString(jsonString)
+
+    return safeString
+})
 
 type GroqData = {
     variableName?: string
@@ -22,107 +22,112 @@ type GroqData = {
     userPrompt?: string
 }
 
-export const groqExecutor: NodeExecutor<GroqData> = async ({ data, nodeId, context, step, publish, userId }) => {
+export const groqExecutor: NodeExecutor<GroqData> = async ({
+    data,
+    nodeId,
+    context,
+    step,
+    publish,
+    userId,
+}) => {
     await publish(
         groqChannel().status({
             nodeId,
-            status: "loading",
+            status: 'loading',
         })
-    );
+    )
 
-    if(!data.variableName) {
+    if (!data.variableName) {
         await publish(
             groqChannel().status({
                 nodeId,
-                status: "error",
+                status: 'error',
             })
-        );
-        throw new NonRetriableError("Groq node: Variable name is missing.");
+        )
+        throw new NonRetriableError('Groq node: Variable name is missing.')
     }
 
-    if(!data.credentialId) {
+    if (!data.credentialId) {
         await publish(
             groqChannel().status({
                 nodeId,
-                status: "error",
+                status: 'error',
             })
-        );
-        throw new NonRetriableError("Groq node: Credentials is missing.");
+        )
+        throw new NonRetriableError('Groq node: Credentials is missing.')
     }
 
-    if(!data.userPrompt) {
+    if (!data.userPrompt) {
         await publish(
             groqChannel().status({
                 nodeId,
-                status: "error",
+                status: 'error',
             })
-        );
-        throw new NonRetriableError("Groq node: User prompt is missing.");
+        )
+        throw new NonRetriableError('Groq node: User prompt is missing.')
     }
 
-    const systemPrompt = data.systemPrompt ? Handlebars.compile(data.systemPrompt)(context) : "You are a helpful assistant." ;
-    const userPrompt = Handlebars.compile(data.userPrompt)(context);
+    const systemPrompt = data.systemPrompt
+        ? Handlebars.compile(data.systemPrompt)(context)
+        : 'You are a helpful assistant.'
+    const userPrompt = Handlebars.compile(data.userPrompt)(context)
 
-    const credentials = await step.run("get-credential", () => {
+    const credentials = await step.run('get-credential', () => {
         return prisma.credential.findUnique({
             where: {
                 id: data.credentialId,
-                userId
-            }
+                userId,
+            },
         })
     })
 
-    if(!credentials) {
+    if (!credentials) {
         await publish(
             groqChannel().status({
                 nodeId,
-                status: "error",
+                status: 'error',
             })
         )
-        throw new NonRetriableError("Groq node: Credentials not found.");
+        throw new NonRetriableError('Groq node: Credentials not found.')
     }
 
     const groq = createGroq({
         apiKey: decrypt(credentials.value),
-    });
+    })
 
     try {
-        const { steps } = await step.ai.wrap(
-            "groq-generate-text",
-            generateText,
-            {
-                model: groq(data.model || "openai/gpt-oss-120b"),
-                system: systemPrompt,
-                prompt: userPrompt,
-                experimental_telemetry: {
-                    isEnabled: true,
-                    recordInputs: true,
-                    recordOutputs: true,
-                }
-            }
-        );
-        const text = steps[0].content[0].type === "text" ? steps[0].content[0].text : "";
+        const { steps } = await step.ai.wrap('groq-generate-text', generateText, {
+            model: groq(data.model || 'openai/gpt-oss-120b'),
+            system: systemPrompt,
+            prompt: userPrompt,
+            experimental_telemetry: {
+                isEnabled: true,
+                recordInputs: true,
+                recordOutputs: true,
+            },
+        })
+        const text = steps[0].content[0].type === 'text' ? steps[0].content[0].text : ''
 
         await publish(
             groqChannel().status({
                 nodeId,
-                status: "success",
+                status: 'success',
             })
-        );
+        )
 
         return {
             ...context,
             [data.variableName]: {
-                text
+                text,
             },
         }
     } catch (error) {
         await publish(
             groqChannel().status({
                 nodeId,
-                status: "error",
+                status: 'error',
             })
-        );
-        throw error;
+        )
+        throw error
     }
-    };
+}
