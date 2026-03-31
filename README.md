@@ -1,271 +1,389 @@
+<div align="center">
+
 # N8N Clone
 
-A modern workflow automation platform built with Next.js 15, featuring a visual node-based editor, AI integrations, and real-time execution.
+[![Next.js](https://img.shields.io/badge/Next.js-15.5-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38bdf8?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Features
+**A modern workflow automation platform built with Next.js 15**
 
-- **Visual Workflow Editor** - Drag-and-drop node-based workflow builder using ReactFlow
-- **Multiple Trigger Types**:
-  - Manual Trigger
-  - HTTP Request Trigger
-  - Google Form Trigger
-  - Stripe Trigger
-  - Telegram Bot Trigger
+A powerful, open-source alternative to n8n featuring a visual node-based editor, AI integrations, and real-time workflow execution.
 
-- **AI Node Integrations**:
-  - Anthropic Claude
-  - OpenAI GPT
-  - Google Gemini
-  - Groq
+[Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
-- **Communication Platforms**:
-  - Discord
-  - Slack
-  - Telegram
+</div>
 
-- **Authentication**:
-  - Email/Password with verification
-  - GitHub OAuth
-  - Google OAuth
+---
 
-- **Subscription Management**:
-  - Polar.sh integration for premium features
-  - Customer portal access
+## ✨ Features
 
-- **Real-time Execution**:
-  - Inngest for workflow orchestration
-  - Live execution status updates
-  - Error handling and retry logic
+### 🎨 Visual Workflow Editor
+- **Drag-and-drop Interface** - Intuitive node-based workflow builder using ReactFlow
+- **Real-time Preview** - See your workflow changes instantly
+- **Customizable Nodes** - Extensible node system for any automation need
 
-- **Database**:
-  - PostgreSQL with Prisma ORM
-  - Encrypted credential storage
+### 🚀 Multiple Trigger Types
+| Trigger | Description |
+|---------|-------------|
+| **Manual Trigger** | Start workflows manually with a single click |
+| **HTTP Request** | Trigger via webhooks and HTTP endpoints |
+| **Google Form** | Automate on Google Form submissions |
+| **Stripe** | React to payment events and customer actions |
+| **Telegram** | Trigger on bot messages and commands |
 
-## Tech Stack
+### 🤖 AI/LLM Integrations
+- **Anthropic Claude** - Advanced reasoning and analysis
+- **OpenAI GPT** - Industry-leading language models
+- **Google Gemini** - Multimodal AI capabilities
+- **Groq** - Lightning-fast inference
+
+### 💬 Communication Platforms
+- **Discord** - Send messages and embeds to channels
+- **Slack** - Post messages and interact with workspaces
+- **Telegram** - Bot messaging and notifications
+
+### 🔐 Authentication & Security
+- Email/Password with verification
+- GitHub OAuth integration
+- Google OAuth integration
+- Encrypted credential storage
+- Secure session management
+
+### 💳 Subscription Management
+- Polar.sh integration for premium features
+- Customer portal access
+- Flexible pricing tiers
+
+### ⚡ Real-time Execution
+- Inngest-powered workflow orchestration
+- Live execution status updates
+- Comprehensive error handling
+- Automatic retry logic
+
+### 🗄️ Database & Storage
+- PostgreSQL with Prisma ORM
+- Encrypted credential storage
+- Type-safe database operations
+
+---
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- **Next.js 15** - React framework with App Router
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Tailwind CSS 4** - Styling
-- **Radix UI** - Component primitives
-- **ReactFlow** - Visual workflow editor
-- **Jotai** - State management
-- **TanStack Query** - Data fetching
-- **tRPC** - End-to-end typesafe APIs
+| Technology | Purpose |
+|------------|---------|
+| **Next.js 15** | React framework with App Router |
+| **React 19** | UI library |
+| **TypeScript** | Type safety |
+| **Tailwind CSS 4** | Utility-first styling |
+| **Radix UI** | Accessible component primitives |
+| **ReactFlow** | Visual workflow editor |
+| **Jotai** | Atomic state management |
+| **TanStack Query** | Server state management |
+| **tRPC** | End-to-end type-safe APIs |
 
 ### Backend
-- **Next.js API Routes** - Serverless API
-- **tRPC Server** - Type-safe API layer
-- **Prisma** - Database ORM
-- **PostgreSQL** - Database
+| Technology | Purpose |
+|------------|---------|
+| **Next.js API Routes** | Serverless API |
+| **tRPC Server** | Type-safe API layer |
+| **Prisma** | Database ORM |
+| **PostgreSQL** | Primary database |
+| **Inngest** | Workflow execution engine |
 
-### Infrastructure
-- **Inngest** - Workflow execution engine
-- **Resend** - Email delivery
-- **Polar.sh** - Subscription management
-- **Sentry** - Error monitoring
-- **Vercel Analytics** - Performance monitoring
+### Infrastructure & Services
+| Service | Purpose |
+|---------|---------|
+| **Resend** | Email delivery |
+| **Polar.sh** | Subscription management |
+| **Sentry** | Error monitoring |
+| **Vercel Analytics** | Performance monitoring |
 
 ### Development Tools
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
-- **Turbo** - Next.js compiler
+- **Turbopack** - Next.js compiler
 - **mprocs** - Process management
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
-src/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication pages
-│   ├── (dashboard)/       # Dashboard and editor
-│   ├── api/               # API routes
-│   │   ├── auth/          # Authentication endpoints
-│   │   ├── inngest/       # Inngest webhook
-│   │   ├── trpc/          # tRPC handler
-│   │   └── webhooks/      # External webhooks
-├── components/            # React components
-│   ├── ui/                # Shadcn UI components
-│   └── react-flow/        # Workflow editor nodes
-├── features/              # Feature modules
-│   ├── auth/              # Authentication
-│   ├── credentials/       # Credential management
-│   ├── editor/            # Workflow editor
-│   ├── executions/        # Execution management
-│   ├── subscriptions/     # Subscription handling
-│   ├── triggers/          # Trigger nodes
-│   └── workflows/         # Workflow management
-├── hooks/                 # Custom React hooks
-├── inngest/               # Inngest functions
-│   └── channels/          # Node execution handlers
-├── lib/                   # Utility libraries
-│   ├── auth.ts            # Authentication config
-│   ├── db.ts              # Database client
-│   ├── email.ts           # Email utilities
-│   └── encryption.ts      # Encryption utilities
-├── trpc/                  # tRPC configuration
-└── config/                # App configuration
+n8n-clone/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── (auth)/            # Authentication pages
+│   │   │   ├── login/         # Login page
+│   │   │   ├── signup/        # Registration page
+│   │   │   ├── forgot-password/
+│   │   │   └── verify-email/
+│   │   ├── (dashboard)/       # Dashboard and editor
+│   │   │   ├── (editor)/      # Workflow editor
+│   │   │   └── (rest)/        # Other dashboard pages
+│   │   ├── api/               # API routes
+│   │   │   ├── auth/          # Authentication endpoints
+│   │   │   ├── inngest/       # Inngest webhook
+│   │   │   ├── trpc/          # tRPC handler
+│   │   │   └── webhooks/      # External webhooks
+│   │   ├── layout.tsx         # Root layout
+│   │   └── globals.css        # Global styles
+│   ├── components/            # React components
+│   │   ├── ui/                # Shadcn UI components
+│   │   ├── react-flow/        # Workflow editor nodes
+│   │   ├── app-header.tsx     # Application header
+│   │   └── app-sidebar.tsx    # Application sidebar
+│   ├── features/              # Feature modules
+│   │   ├── auth/              # Authentication logic
+│   │   ├── credentials/       # Credential management
+│   │   ├── editor/            # Workflow editor
+│   │   ├── executions/        # Execution management
+│   │   ├── subscriptions/     # Subscription handling
+│   │   ├── triggers/          # Trigger nodes
+│   │   └── workflows/         # Workflow management
+│   ├── hooks/                 # Custom React hooks
+│   ├── inngest/               # Inngest functions
+│   │   ├── channels/          # Node execution handlers
+│   │   ├── client.ts          # Inngest client
+│   │   ├── functions.ts       # Workflow functions
+│   │   └── utils.ts           # Utility functions
+│   ├── lib/                   # Utility libraries
+│   │   ├── auth.ts            # Authentication config
+│   │   ├── db.ts              # Database client
+│   │   ├── email.ts           # Email utilities
+│   │   └── encryption.ts      # Encryption utilities
+│   ├── trpc/                  # tRPC configuration
+│   │   ├── client.ts          # tRPC client
+│   │   ├── server.ts          # tRPC server
+│   │   └── routers/           # API routers
+│   └── config/                # App configuration
+├── prisma/
+│   └── schema.prisma          # Database schema
+├── public/                    # Static assets
+├── mprocs.yaml                # Process management config
+├── next.config.ts             # Next.js configuration
+├── tsconfig.json              # TypeScript configuration
+└── package.json               # Dependencies and scripts
 ```
 
-## Getting Started
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 20+
-- PostgreSQL database
-- Ngrok (for local webhook testing)
-- Inngest account
+- **Node.js** 20 or higher
+- **PostgreSQL** database
+- **Ngrok** (for local webhook testing)
+- **Inngest** account
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd n8n-clone
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/DakshSitapara/n8n-clone.git
+   cd n8n-clone
+   ```
 
-2. Install dependencies:
-```bash
-npm install
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-3. Set up environment variables:
-```bash
-cp .env.example .env
-```
+3. **Set up environment variables**
 
-Edit `.env` with your configuration:
+   Create a `.env` file in the root directory:
 
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/n8n-clone"
+   ```env
+   # Database
+   DATABASE_URL="postgresql://user:password@localhost:5432/n8n-clone"
 
-# Auth
-BETTER_AUTH_URL="http://localhost:3000"
-BETTER_AUTH_SECRET="your-secret-key"
-GITHUB_CLIENT_ID="your-github-client-id"
-GITHUB_CLIENT_SECRET="your-github-client-secret"
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
+   # Authentication
+   BETTER_AUTH_URL="http://localhost:3000"
+   BETTER_AUTH_SECRET="your-secret-key-here"
+   GITHUB_CLIENT_ID="your-github-client-id"
+   GITHUB_CLIENT_SECRET="your-github-client-secret"
+   GOOGLE_CLIENT_ID="your-google-client-id"
+   GOOGLE_CLIENT_SECRET="your-google-client-secret"
 
-# Email (Resend)
-RESEND_API_KEY="your-resend-api-key"
+   # Email (Resend)
+   RESEND_API_KEY="your-resend-api-key"
 
-# Inngest
-INNGEST_EVENT_KEY="your-inngest-event-key"
-INNGEST_SIGNING_KEY="your-inngest-signing-key"
-INNGEST_API_URL="https://api.inngest.com"
+   # Inngest
+   INNGEST_EVENT_KEY="your-inngest-event-key"
+   INNGEST_SIGNING_KEY="your-inngest-signing-key"
+   INNGEST_API_URL="https://api.inngest.com"
 
-# Polar
-POLAR_ACCESS_TOKEN="your-polar-token"
-POLAR_PRODUCT_ID="your-product-id"
-POLAR_SUCCESS_URL="http://localhost:3000/success"
+   # Polar.sh (Subscriptions)
+   POLAR_ACCESS_TOKEN="your-polar-token"
+   POLAR_PRODUCT_ID="your-product-id"
+   POLAR_SUCCESS_URL="http://localhost:3000/success"
 
-# Sentry (optional)
-NEXT_PUBLIC_SENTRY_DSN="your-sentry-dsn"
-SENTRY_AUTH_TOKEN="your-sentry-token"
+   # Sentry (Optional - Error Monitoring)
+   NEXT_PUBLIC_SENTRY_DSN="your-sentry-dsn"
+   SENTRY_AUTH_TOKEN="your-sentry-token"
 
-# Webhooks
-NGROK_URL="your-ngrok-url"
-```
+   # Webhooks
+   NGROK_URL="your-ngrok-url"
+   ```
 
-4. Set up the database:
-```bash
-npx prisma migrate dev
-npx prisma generate
-```
+4. **Set up the database**
+   ```bash
+   npx prisma migrate dev
+   npx prisma generate
+   ```
 
-### Development
+5. **Start the development server**
 
-Start all services with mprocs:
-```bash
-npm run dev:all
-```
+   Start all services at once:
+   ```bash
+   npm run dev:all
+   ```
 
-Or start services individually:
-```bash
-npm run dev          # Next.js development server
-npm run inngest:dev  # Inngest dev server
-npm run ngrok:dev    # Ngrok tunnel
-```
+   Or start services individually:
+   ```bash
+   npm run dev          # Next.js development server
+   npm run inngest:dev  # Inngest dev server
+   npm run ngrok:dev    # Ngrok tunnel
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+6. **Open your browser**
 
-### Building for Production
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-```bash
-npm run build
-npm start
-```
+---
 
-## Available Scripts
+## 📖 Documentation
 
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run format` - Format code with Prettier
-- `npm run check` - Format, lint, and build
-- `npm run dev:all` - Start all development services
-- `npm run inngest:dev` - Start Inngest dev server
-- `npm run ngrok:dev` - Start Ngrok tunnel
+### Available Scripts
 
-## Node Types
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server with Turbopack |
+| `npm run build` | Build for production |
+| `npm start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Format code with Prettier |
+| `npm run check` | Format, lint, and build |
+| `npm run dev:all` | Start all development services |
+| `npm run inngest:dev` | Start Inngest dev server |
+| `npm run ngrok:dev` | Start Ngrok tunnel |
 
-### Triggers
+### Node Types
+
+#### Triggers
 - **Manual Trigger** - Manually start workflow execution
 - **HTTP Request** - Trigger via HTTP webhook
 - **Google Form** - Trigger on Google Form submission
 - **Stripe** - Trigger on Stripe events
 - **Telegram** - Trigger on Telegram messages
 
-### AI/LLM
+#### AI/LLM Nodes
 - **Anthropic** - Claude API integration
 - **OpenAI** - GPT models
 - **Gemini** - Google AI models
 - **Groq** - Fast inference
 
-### Communication
+#### Communication Nodes
 - **Discord** - Send messages to Discord
 - **Slack** - Send messages to Slack
 - **Telegram** - Send messages via Telegram bot
 
-## Database Schema
+### Database Schema
 
 Key models:
-- **User** - User accounts with OAuth and email auth
-- **Workflow** - Workflow definitions
-- **Node** - Individual workflow nodes
-- **Connection** - Node connections
-- **Execution** - Workflow execution records
-- **Credential** - Encrypted API credentials
 
-## Security
+| Model | Description |
+|-------|-------------|
+| **User** | User accounts with OAuth and email auth |
+| **Workflow** | Workflow definitions and metadata |
+| **Node** | Individual workflow nodes with configuration |
+| **Connection** | Node connections and data flow |
+| **Execution** | Workflow execution records and status |
+| **Credential** | Encrypted API credentials |
 
-- Encrypted credential storage using Cryptr
-- Email verification required
-- Secure session management
-- Environment-based configuration
-- Sentry error monitoring
+### Security Features
 
-## Deployment
+- 🔒 Encrypted credential storage using Cryptr
+- ✉️ Email verification required
+- 🛡️ Secure session management
+- ⚙️ Environment-based configuration
+- 📊 Sentry error monitoring
 
-This project is optimized for deployment on Vercel:
+---
 
-1. Connect your GitHub repository to Vercel
-2. Configure environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+## 🌐 Deployment
 
-For self-hosting:
-- Ensure PostgreSQL is accessible
-- Configure Inngest with your deployment URL
-- Set up proper webhooks
+### Vercel (Recommended)
 
-## License
+1. Connect your GitHub repository to [Vercel](https://vercel.com)
+2. Configure environment variables in the Vercel dashboard
+3. Deploy automatically on push to the main branch
 
-MIT
+### Self-Hosting
 
-## Contributing
+For self-hosting deployments:
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Ensure PostgreSQL is accessible
+2. Configure Inngest with your deployment URL
+3. Set up proper webhooks
+4. Run the production build:
+   ```bash
+   npm run build
+   npm start
+   ```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow the existing code style
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation as needed
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/)
+- UI components from [shadcn/ui](https://ui.shadcn.com/)
+- Workflow editor powered by [ReactFlow](https://reactflow.dev/)
+- Authentication by [better-auth](https://www.better-auth.com/)
+- Workflow orchestration by [Inngest](https://inngest.com/)
+
+---
+
+## 📞 Support
+
+- 📧 Email: support@example.com
+- 🐛 Issues: [GitHub Issues](https://github.com/DakshSitapara/n8n-clone/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/DakshSitapara/n8n-clone/discussions)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [DakshSitapara](https://github.com/DakshSitapara)**
+
+[⬆ Back to Top](#n8n-clone)
+
+</div>
