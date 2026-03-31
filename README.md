@@ -1,15 +1,27 @@
 <div align="center">
 
+<img src="https://raw.githubusercontent.com/DakshSitapara/n8n-clone/refs/heads/main/public/logos/logo.svg" alt="N8N Clone Logo" width="120" height="120">
+
 # N8N Clone
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.5-black?logo=next.js&logoColor=white)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38bdf8?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/DakshSitapara/n8n-clone?style=social)](https://github.com/DakshSitapara/n8n-clone/stargazers)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Now-blue?logo=vercel)](https://n8n-clone-nu.vercel.app/)
 
 **A modern workflow automation platform built with Next.js 15**
 
 A powerful, open-source alternative to n8n featuring a visual node-based editor, AI integrations, and real-time workflow execution.
+
+### 🎯 Key Highlights
+
+- 🎨 **Intuitive Visual Editor** - Build complex workflows with drag-and-drop simplicity
+- 🤖 **AI-Powered** - Integrate with Claude, GPT, Gemini, and Groq
+- ⚡ **Real-time Execution** - Monitor workflows as they run
+- 🔒 **Enterprise-Grade Security** - Encrypted credentials and secure auth
+- 🚀 **Production Ready** - Built with modern, scalable technologies
 
 [Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
@@ -314,6 +326,49 @@ Key models:
 
 ---
 
+## 🗺️ Roadmap
+
+### Upcoming Features
+
+- [ ] **More AI Integrations** - Support for additional AI providers
+- [ ] **Custom Node Builder** - Create and share custom nodes
+- [ ] **Workflow Templates** - Pre-built workflow templates
+- [ ] **Advanced Scheduling** - Cron-based workflow triggers
+- [ ] **Webhook Testing** - Built-in webhook testing tool
+- [ ] **Export/Import** - Workflow export and import functionality
+- [ ] **Version History** - Track workflow changes over time
+- [ ] **Team Collaboration** - Multi-user workspace support
+- [ ] **Mobile App** - Native mobile applications
+
+### Planned Improvements
+
+- Enhanced error reporting and debugging tools
+- Performance optimizations for large workflows
+- Additional authentication providers (Microsoft, etc.)
+- More communication platform integrations
+- Advanced data transformation nodes
+
+---
+
+## 📸 Screenshots
+
+### Login Page
+<div align="center">
+  <img src="https://api.microlink.io/?url=https://n8n-clone-nu.vercel.app/&screenshot=true&meta=false&embed=screenshot.url&darkMode=true" alt="N8N Clone Login Page" width="600">
+  <p><em>Clean, modern authentication interface with OAuth support</em></p>
+</div>
+
+> Visit the [live demo](https://n8n-clone-nu.vercel.app/) to explore the full application.
+
+### Key UI Features
+- 🎨 Dark/Light theme support
+- 📱 Fully responsive design
+- 🔐 Secure authentication flow with OAuth (GitHub & Google)
+- ⚡ Fast page loads with Next.js 15
+- 🎯 Clean, modern interface
+
+---
+
 ## 🌐 Deployment
 
 ### Vercel (Recommended)
@@ -356,6 +411,16 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
+## ⭐ Show Your Support
+
+If this project helped you or you find it useful, please consider giving it a ⭐ on GitHub!
+
+<a href="https://github.com/DakshSitapara/n8n-clone">
+  <img src="https://raw.githubusercontent.com/DakshSitapara/n8n-clone/refs/heads/main/public/logos/logo.svg" alt="Star the repo" width="100" height="100">
+</a>
+
+---
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -374,7 +439,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 📧 Email: support@example.com
+- 📧 Email: dakshsitapara@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/DakshSitapara/n8n-clone/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/DakshSitapara/n8n-clone/discussions)
 
