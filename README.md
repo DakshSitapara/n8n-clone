@@ -459,30 +459,6 @@ A: Connect your GitHub repo to Vercel and configure environment variables in the
 
 ---
 
-## 🗺️ Roadmap
-
-### Upcoming Features
-
-- [ ] **More AI Integrations** - Support for additional AI providers
-- [ ] **Custom Node Builder** - Create and share custom nodes
-- [ ] **Workflow Templates** - Pre-built workflow templates
-- [ ] **Advanced Scheduling** - Cron-based workflow triggers
-- [ ] **Webhook Testing** - Built-in webhook testing tool
-- [ ] **Export/Import** - Workflow export and import functionality
-- [ ] **Version History** - Track workflow changes over time
-- [ ] **Team Collaboration** - Multi-user workspace support
-- [ ] **Mobile App** - Native mobile applications
-
-### Planned Improvements
-
-- Enhanced error reporting and debugging tools
-- Performance optimizations for large workflows
-- Additional authentication providers (Microsoft, etc.)
-- More communication platform integrations
-- Advanced data transformation nodes
-
----
-
 ## 📸 Screenshots
 
 ### Login Page
@@ -522,25 +498,6 @@ For self-hosting deployments:
    npm run build
    npm start
    ```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow the existing code style
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation as needed
 
 ---
 
