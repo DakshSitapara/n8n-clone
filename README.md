@@ -534,6 +534,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <div align="center">
 
 **Made with ❤️ by [DakshSitapara](https://github.com/DakshSitapara)**
+
 [![GitHub followers](https://img.shields.io/github/followers/DakshSitapara?style=social)](https://github.com/DakshSitapara)
 [![GitHub stars](https://img.shields.io/github/stars/DakshSitapara/n8n-clone?style=social)](https://github.com/DakshSitapara/n8n-clone)
 
